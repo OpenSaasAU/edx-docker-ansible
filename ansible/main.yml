@@ -63,6 +63,16 @@
     - common_vars
     - { role: 'edxapp', skip_static_remove: True }
     
+- hosts: celeryworker
+  gather_facts: True
+  become: true 
+  vars:
+    serial_count: 1
+  serial: "{{ serial_count }}"
+  roles:
+    - common_vars
+    - { role: 'edxapp', celery_worker: True }    
+
 - hosts: xqueue
   gather_facts: True
   roles:

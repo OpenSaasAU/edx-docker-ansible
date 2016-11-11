@@ -5,7 +5,7 @@ services:
  db:
   image: mysql:5.7
   labels:
-    io.rancher.container.network: 'true'
+     io.rancher.container.network: 'true'
   volumes: 
    - "{{DOCKER_DATA_ROOT}}/mysql/data:/var/lib/mysql"
   environment:
@@ -147,19 +147,25 @@ services:
    - "{{DOCKER_EDX_ROOT}}/edx-platform:/edx/app/edxapp/edx-platform"
    - /dev/log:/dev/log
    - "{{DOCKER_DATA_ROOT}}/edxapp:/edx/var/edxapp"
-  # Add your containers here, specifying the base image you want to build from
-  # For example:
-  #
-  # web:
-  #   image: ubuntu:trusty
-  #   ports:
-  #     - "80:80"
-  #   command: ['/usr/bin/dumb-init', '/usr/sbin/apache2ctl', '-D', 'FOREGROUND']
-  #   dev_overrides:
-  #     environment:
-  #       - "DEBUG=1"
-  #
- 
+
+celeryworker:
+  image: opensaas/edxapp:trusty-v3
+  labels:
+    io.rancher.container.network: 'true'
+  links:
+   - db:db
+   - forums:forums
+   - xqueue:xqueue
+   - memcache:memcache
+   - mongo:mongo
+   - es:es
+   - rabbitmq:rabbitmq
+  command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
+  volumes:
+   - "{{DOCKER_EDX_ROOT}}/edx-platform:/edx/app/edxapp/edx-platform"
+   - /dev/log:/dev/log
+   
+   
  analytics:
   image: edxops/trusty-common:v3
   labels:
