@@ -1,0 +1,50 @@
+---
+- name: Update APT cache
+  apt: update_cache=yes
+
+- name: Ensure dependencies are installed
+  apt: "pkg={{ item }} state=present"
+  with_items:
+    - build-essential
+    - automake
+    - libtool
+
+- name: Clone libsass repository
+  git:
+    repo: https://github.com/sass/libsass.git
+    dest: /usr/src/libsass
+    accept_hostkey: yes
+    depth: 1
+    force: yes
+
+- name: Clone saasc repository
+  git:
+    repo: https://github.com/sass/sassc.git
+    dest: /usr/src/libsass/sassc
+    accept_hostkey: yes
+    depth: 1
+    force: yes
+
+- name: Compile libsass
+  shell: make -C libsass --jobs={{ ansible_processor_cores }} chdir=/usr/src
+  environment:
+    BUILD: shared
+
+- name: Compile sassc
+  shell: make -C libsass --jobs={{ ansible_processor_cores }} sassc chdir=/usr/src
+  environment:
+    SASS_LIBSASS_PATH: /usr/src/libsass
+
+- name: Copy libsass compiled libraries
+  copy:
+    src: '/usr/src/libsass/lib/{{ item }}'
+    dest: '/usr/local/lib/{{ item }}'
+  with_items:
+    - libsass.a
+    - libsass.so
+
+- name: Copy sassc compiled binary file
+  copy:
+    src: '/usr/src/libsass/sassc/bin/sassc'
+    dest: '/usr/local/bin/sassc'
+    mode: 'u+rwx,go+rx,go-w'

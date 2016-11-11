@@ -1,0 +1,2 @@
+DOCKER_DATA_ROOT: "~/Development/edx-docker-ansible/data"
+DOCKER_EDX_ROOT: "~/Development/edx-docker-ansible/edx"

@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: Andrzej Ośmiałówski
+  description: Ansible role that installs libsass on Ubuntu.
+  license: BSD
+  min_ansible_version: 1.9
+  platforms:
+    - name: Ubuntu
+      versions:
+        - lucid
+        - maverick
+        - trusty
+  categories:
+    - development
+    - system
+    - web
+dependencies: []

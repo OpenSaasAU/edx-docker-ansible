@@ -1,0 +1,159 @@
+EDXAPP_MYSQL_HOST: "db"
+EDXAPP_MONGO_HOSTS:
+  - "mongo"
+MONGO_ADMIN_USER: "admin"
+MONGO_ADMIN_PASSWORD: "password"
+
+EDXAPP_ELASTIC_SEARCH_CONFIG:
+ - host: "es"
+   port: 9200
+   
+EDXAPP_MEMCACHE: [ 'memcache:11211' ]
+MONGO_CLUSTERED: false
+#EDXAPP_LMS_SITE_NAME: 'lms'
+#EDXAPP_CMS_SITE_NAME: 'cms'
+EDXAPP_RABBIT_HOSTNAME: 'rabbitmq'
+EDXAPP_PYTHON_SANDBOX: false
+edxapp_cms_gunicorn_host: 0.0.0.0
+edxapp_lms_gunicorn_host: 0.0.0.0
+insights_gunicorn_host: 0.0.0.0
+analytics_api_gunicorn_host: 0.0.0.0
+xqueue_gunicorn_host: 0.0.0.0
+edxapp_lms_preview_gunicorn_port: 8000
+edxapp_cms_gunicorn_port: 8010
+edxapp_lms_gunicorn_port: 8000
+analytics_api_gunicorn_port: 8100
+insights_gunicorn_port: 8110
+xqueue_gunicorn_port: 8040
+
+EDXAPP_LMS_NGINX_PORT: 80
+EDXAPP_CMS_NGINX_PORT: 18010
+EDXAPP_LMS_PREVIEW_NGINX_PORT: 18020
+INSIGHTS_NGINX_PORT: 18110
+ANALYTICS_API_NGINX_PORT: 18100
+XQUEUE_NGINX_PORT: 18040
+
+
+
+EDXAPP_COMMENTS_SERVICE_URL: 'http://forums:4567'
+
+worker_core_mult:
+  lms: 1
+  cms: 1
+
+service_variants_enabled:
+  - "{{ inventory_hostname }}"
+
+edxapp_staticfile_dir: '/edx/var/edxapp/staticfiles'
+
+
+EDXAPP_PLATFORM_NAME: 'Opensaas Learning Platform'
+EDXAPP_SITE_NAME: 'edx.opensaas.local'
+EDXAPP_CMS_SITE_NAME: 'studio.edx.opensaas.local'
+
+migrate_db: 'yes'
+COMMON_MYSQL_MIGRATE_USER: 'root'
+    
+XQUEUE_MYSQL_DB_NAME: 'xqueuedb'
+XQUEUE_MYSQL_USER: 'xqueue001'
+XQUEUE_MYSQL_PASSWORD: 'password'
+XQUEUE_MYSQL_HOST: 'db'
+XQUEUE_MYSQL_PORT: '3306'
+
+EDXAPP_MYSQL_DB_NAME: 'edxapp'
+EDXAPP_MYSQL_USER: 'edxapp001'
+EDXAPP_MYSQL_USER_ADMIN: 'root'
+EDXAPP_MYSQL_PASSWORD: 'password'
+
+EDXAPP_MYSQL_CSMH_DB_NAME: "edxapp_csmh"
+EDXAPP_MYSQL_CSMH_USER: "{{ EDXAPP_MYSQL_USER }}"
+EDXAPP_MYSQL_CSMH_PASSWORD: "{{ EDXAPP_MYSQL_PASSWORD }}"
+
+ANALYTICS_API_DEFAULT_DB_NAME: 'analytics-api'
+ANALYTICS_API_REPORTS_DB_NAME: 'reports'
+
+ANALYTICS_API_DATABASES:
+  # rw user
+  default:
+    ENGINE: 'django.db.backends.mysql'
+    NAME: '{{ ANALYTICS_API_DEFAULT_DB_NAME }}'
+    USER: 'api001'
+    PASSWORD: 'password'
+    HOST: 'db'
+    PORT: '3306'
+  # read-only user
+  reports:
+    ENGINE: 'django.db.backends.mysql'
+    NAME: '{{ ANALYTICS_API_REPORTS_DB_NAME }}'
+    USER: 'reports001'
+    PASSWORD: 'password'
+    HOST: "db"
+    PORT: '3306'
+    
+MONGO_USERS:
+  - user: cs_comments_service
+    password: password
+    database: cs_comments_service
+    roles: readWrite
+  - user: edxapp
+    password: password
+    database: edxapp
+    roles: readWrite
+
+ENABLE_DATADOG: False
+ENABLE_SPLUNKFORWARDER: False
+ENABLE_NEWRELIC: False
+
+INSIGHTS_LMS_BASE: "http://lms:8000"
+INSIGHTS_CMS_BASE: "http://cms:8010"
+INSIGHTS_BASE_URL: "http://insights:8110"
+INSIGHTS_MEMCACHE:
+  - "memcache:11211"
+ANALYTICS_API_ENDPOINT: "http://analtyics:8100/api/v0"
+INSIGHTS_DATABASE_NAME: insightsdb
+INSIGHTS_DATABASES:
+  # rw user
+  default:
+    ENGINE: 'django.db.backends.mysql'
+    NAME: '{{ INSIGHTS_DATABASE_NAME }}'
+    USER: 'rosencrantz'
+    PASSWORD: 'secret'
+    HOST: "db"
+    PORT: '3306'
+    
+
+nginx_xqueue_gunicorn_hosts:
+  - xqueue
+nginx_lms_gunicorn_hosts:
+  - lms
+nginx_lms_preview_gunicorn_hosts:
+  - lms
+nginx_cms_gunicorn_hosts:
+  - cms
+nginx_analytics_api_gunicorn_hosts:
+  - analytics
+nginx_insights_gunicorn_hosts:
+  - insights
+#nginx_gitreload_gunicorn_hosts:
+#  - 127.0.0.1
+#nginx_edx_notes_api_gunicorn_hosts:
+#  - 127.0.0.1
+#nginx_ecommerce_gunicorn_hosts:
+#  - 127.0.0.1
+#nginx_programs_gunicorn_hosts:
+#  - 127.0.0.1
+#nginx_credentails_gunicorn_hosts:
+#  - 127.0.0.1 
+
+forum_data_dir: "{{ COMMON_DATA_DIR }}/forum"
+insights_service_name: insights
+analytics_api_service_name: analytics
+EDXAPP_ENABLE_RATE_LIMITING: false
+EDXAPP_PROFILE_IMAGE_MAX_BYTES: 1048576
+
+EDXAPP_MEDIA_URL:  "/media"
+edxapp_data_dir: "{{ COMMON_DATA_DIR }}/edxapp"
+edxapp_media_dir: "{{ edxapp_data_dir }}/media"
+EDXAPP_PROFILE_IMAGE_MAX_AGE: 31536000
+
+nginx_conf_dir: '/etc/nginx/conf.d'

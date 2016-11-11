@@ -1,0 +1,123 @@
+{%- if "cms" in nginx_default_sites -%}
+  {%- set default_site = "default_server" -%}
+{%- else -%}
+  {%- set default_site = "" -%}
+{%- endif -%}
+
+upstream cms-backend {
+    {% for host in nginx_cms_gunicorn_hosts %}
+        server {{ host }}:{{ edxapp_cms_gunicorn_port }} fail_timeout=0;
+    {% endfor %}
+}
+
+server {
+  # CMS configuration file for nginx, templated by ansible
+      
+  # Proxy to a remote maintanence page
+  {% if NGINX_EDXAPP_ENABLE_S3_MAINTENANCE %}
+
+  # Do not include a 502 error in NGINX_ERROR_PAGES when 
+  # NGINX_EDXAPP_ENABLE_S3_MAINTENANCE is enabled.
+
+  error_page 502 @maintenance;
+
+    {% include "s3_maintenance.j2" %}
+  
+  {% endif %}
+
+  # error pages
+  {% for k, v in NGINX_EDXAPP_ERROR_PAGES.iteritems() %}
+error_page {{ k }} {{ v }};
+  {% endfor %}
+
+  listen {{ EDXAPP_CMS_NGINX_PORT }} {{ default_site }};
+
+  {% if NGINX_ENABLE_SSL %}
+
+  listen {{ EDXAPP_CMS_SSL_NGINX_PORT }} ssl;
+
+  ssl_certificate /etc/ssl/certs/{{ NGINX_SSL_CERTIFICATE|basename }};
+  ssl_certificate_key /etc/ssl/private/{{ NGINX_SSL_KEY|basename }};
+  # request the browser to use SSL for all connections
+  add_header Strict-Transport-Security "max-age=31536000; includeSubDomains";
+  {% endif %}
+
+  # Prevent invalid display courseware in IE 10+ with high privacy settings
+  add_header P3P '{{ NGINX_P3P_MESSAGE }}';
+
+  # Nginx does not support nested condition or or conditions so
+  # there is an unfortunate mix of conditonals here.
+  {% if NGINX_REDIRECT_TO_HTTPS %}
+     {% if NGINX_HTTPS_REDIRECT_STRATEGY == "scheme" %}
+  # Redirect http to https over single instance
+  if ($scheme != "https") 
+  { 
+   set $do_redirect_to_https "true";
+  }
+
+     {% elif NGINX_HTTPS_REDIRECT_STRATEGY == "forward_for_proto" %}
+
+  # Forward to HTTPS if we're an HTTP request... and the server is behind ELB 
+  if ($http_x_forwarded_proto = "http") 
+  {
+   set $do_redirect_to_https "true";
+  }
+     {% endif %}
+
+  # Execute the actual redirect
+  if ($do_redirect_to_https = "true")
+  {
+  return 301 https://$host$request_uri;
+  }
+  {% endif %}
+
+  server_name {{ CMS_HOSTNAME }};
+
+  access_log {{ nginx_log_dir }}/access.log {{ NGINX_LOG_FORMAT_NAME }};
+  error_log {{ nginx_log_dir }}/error.log error;
+
+  # CS184 requires uploads of up to 4MB for submitting screenshots. 
+  # CMS requires larger value for course assest, values provided 
+  # via hiera.
+  client_max_body_size 100M;
+  
+  rewrite ^(.*)/favicon.ico$ /static/images/favicon.ico last;
+
+
+  location @proxy_to_cms_app {
+    {% if NGINX_SET_X_FORWARDED_HEADERS %}
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Port $server_port;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    {% else %}
+    proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+    proxy_set_header X-Forwarded-Port $http_x_forwarded_port;
+    proxy_set_header X-Forwarded-For $http_x_forwarded_for;
+    {% endif %}
+    proxy_set_header Host $http_host;
+
+    proxy_redirect off;
+    proxy_pass http://cms-backend;
+  }
+
+  location / {
+    {% if EDXAPP_CMS_ENABLE_BASIC_AUTH|bool %}
+      {% include "basic-auth.j2" %}
+    {% endif %}
+    try_files $uri @proxy_to_cms_app;
+  }
+
+  # No basic auth security on the github_service_hook url, so that github can use it for cms
+  location /github_service_hook {
+    try_files $uri @proxy_to_cms_app;
+  }
+
+  # No basic auth security on the heartbeat url, so that ELB can use it
+  location /heartbeat {
+    try_files $uri @proxy_to_cms_app;
+  }
+
+  {% include "robots.j2" %}
+  {% include "static-files.j2" %}
+
+}

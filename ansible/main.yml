@@ -1,0 +1,101 @@
+# This should be your Ansible playbooks to provision your containers.
+# An inventory will be automatically created using the names of the services
+# from your container.yml file.
+# Add any roles or other modules you'll need to this directory too.
+# For many examples of roles, check out Ansible Galaxy: https://galaxy.ansible.com/
+#
+
+- hosts: mongo,nginx
+  gather_facts: false
+  tasks:
+    - raw: which python || apt-get update
+    - raw: (which python && which aptitude) || apt-get install -y python
+  tags:
+    - install
+    - install:app-requirements
+    
+    
+- name: Deploy Nginx
+  hosts: nginx
+  roles:
+    - common_vars
+    - role: nginx
+      nginx_sites:
+      - cms
+      - lms
+      - analytics_api
+      - insights
+      - lms-preview
+      - xqueue
+      nginx_default_sites:
+      - lms
+      - cms
+    
+- hosts: mongo
+  gather_facts: True
+  roles:
+    - common_vars
+    - mongo_docker
+    
+- hosts: edxconfig
+  gather_facts: True
+  roles:
+    - common_vars
+    - docker_db_setup
+    
+- hosts: lms
+  gather_facts: True
+  become: true 
+  vars:
+    serial_count: 1
+  serial: "{{ serial_count }}"
+  roles:
+    - common_vars
+    - edxapp
+    
+- hosts: cms
+  gather_facts: True
+  become: true 
+  vars:
+    serial_count: 1
+  serial: "{{ serial_count }}"
+  roles:
+    - common_vars
+    - { role: 'edxapp', skip_static_remove: True }
+    
+- hosts: xqueue
+  gather_facts: True
+  roles:
+    - common_vars
+    - xqueue
+
+- hosts: analytics
+  gather_facts: True
+  vars:
+    serial_count: 1
+  serial: "{{ serial_count }}"
+  roles:
+    - common_vars
+    - analytics_api
+    
+    
+- name: Deploy forum
+  hosts: forums
+  gather_facts: True
+  vars:
+    serial_count: 1
+  serial: "{{ serial_count }}"
+  roles:
+    - common_vars
+    - forum
+    
+- name: Deploy Insights
+  hosts: insights
+  become: true
+  gather_facts: True
+  vars:
+    serial_count: 1
+  serial: "{{ serial_count }}"
+  roles:
+    - common_vars
+    - insights

@@ -1,0 +1,1 @@
+ansible-container --var-file container_vars.yml run -d

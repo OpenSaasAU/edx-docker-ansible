@@ -1,0 +1,66 @@
+- name: Start MongoDB during Build
+  shell: /entrypoint.sh mongod &
+  when: not MONGO_CLUSTERED
+  tags:
+    - install
+    - install:configuration
+    
+    
+- name: Copy mongodb key file
+  copy:
+    content: "{{ MONGO_CLUSTER_KEY }}"
+    dest: "{{ mongo_key_file }}"
+    mode: "0600"
+    owner: mongodb
+    group: mongodb
+  when: MONGO_CLUSTERED
+  tags:
+    - install
+    - install:configuration
+
+
+- name: Drop super user script
+  template:
+    src: "create_root.js.j2"
+    dest: "/tmp/create_root.js"
+  when: not MONGO_CLUSTERED
+  tags:
+    - install
+    - install:configuration
+
+- name: Create super user with js
+  shell: "mongo admin /tmp/create_root.js"
+  when: not MONGO_CLUSTERED
+  tags:
+    - install
+    - install:configuration
+
+- name: Delete super user script
+  file:
+    path: /tmp/create_root.js
+    state: absent
+  when: not MONGO_CLUSTERED
+  tags:
+    - install
+    - install:configuration
+
+- name: Create the file to initialize the mongod replica set
+  template:
+    src: "repset_init.js.j2"
+    dest: "/tmp/repset_init.js"
+  when: MONGO_CLUSTERED
+  tags:
+    - install
+    - install:configuration
+
+- name: Initialize the replication set
+  shell: "/usr/bin/mongo /tmp/repset_init.js"
+  when: MONGO_CLUSTERED
+  tags:
+    - install
+    - install:configuration
+
+#- name: delete repset script
+#  file: path=/tmp/repset_init.js state=absent
+#  when: MONGO_CLUSTERED
+

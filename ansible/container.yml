@@ -1,0 +1,217 @@
+version: "1"
+#defaults:
+
+services:
+ db:
+  image: mysql:5.7
+  labels:
+    io.rancher.container.network: 'true'
+  volumes: 
+   - "{{DOCKER_DATA_ROOT}}/mysql/data:/var/lib/mysql"
+  environment:
+   MYSQL_ROOT_PASSWORD: password
+   MYSQL_DATABASE: edxapp
+   MYSQL_USER: edxapp001
+   MYSQL_PASSWORD: password
+  
+ mongo:
+  image: mongo:3.3
+  labels:
+    io.rancher.container.network: 'true'
+  command: /entrypoint.sh mongod --auth
+  volumes:
+   - "{{DOCKER_DATA_ROOT}}/mongo/data:/data/db"
+
+ #mongoConfig:
+#  image: mongo:3.3
+#  links:
+#   - mongo:mongo
+#  command: /bin/false
+
+# Need to build our own for ES 0.9
+ es:
+  image: opensaas/edx-elasticsearch
+  labels:
+    io.rancher.container.network: 'true'
+  volumes:
+   - "{{DOCKER_DATA_ROOT}}/elasticsearch/data:/data"
+
+
+ memcache:
+  image: memcached:1.4.24
+  labels:
+    io.rancher.container.network: 'true'
+  volumes:
+   - "{{DOCKER_DATA_ROOT}}/memcache/data:/data"
+
+
+ nginx:
+  image: nginx
+  labels:
+    io.rancher.container.network: 'true'
+  links:
+   - lms:lms
+   - cms:cms
+   - xqueue:xqueue
+   - insights:insights
+   - analytics:analytics
+  volumes:
+   - "{{DOCKER_DATA_ROOT}}:/edx/var"
+  command: |
+    /bin/bash -c "nginx -g 'daemon off;'"
+  ports:
+   - 6080:80
+   - 6443:443
+   - 18000:18000
+   - 18010:18010
+   - 18020:18020
+   - 18040:18040
+   - 18100:18100
+   - 18110:18110
+
+
+ rabbitmq:
+  image: rabbitmq:3.5.3
+  labels:
+    io.rancher.container.network: 'true'
+  volumes:
+   - "{{DOCKER_DATA_ROOT}}/rabbitmq/data:/var/lib/rabbitmq"
+  environment:
+    RABBITMQ_DEFAULT_USER: celery
+    RABBITMQ_DEFAULT_PASS: celery
+
+ forums:
+  image: opensaas/edx-forums
+  labels:
+    io.rancher.container.network: 'true'
+  links:
+   - db:db
+   - xqueue:xqueue
+   - memcache:memcache
+   - mongo:mongo
+   - es:es
+   - rabbitmq:rabbitmq
+  command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
+  volumes:
+   - "{{DOCKER_EDX_ROOT}}/cs_comments_service:/edx/app/forum/cs_comments_service"
+
+   
+ xqueue:
+  image: opensaas/edx-xqueue
+  labels:
+    io.rancher.container.network: 'true'
+  links:
+   - db:db
+   - memcache:memcache
+   - mongo:mongo
+   - es:es
+   - rabbitmq:rabbitmq
+  command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
+  volumes:
+   - "{{DOCKER_EDX_ROOT}}/xqueue:/edx/app/edxapp/xqueue"
+   - /dev/log:/dev/log
+
+
+ lms:
+  image: opensaas/edxapp:trusty-v3
+  labels:
+    io.rancher.container.network: 'true'
+  links:
+   - db:db
+   - forums:forums
+   - xqueue:xqueue
+   - memcache:memcache
+   - mongo:mongo
+   - es:es
+   - rabbitmq:rabbitmq
+  command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
+  volumes:
+   - "{{DOCKER_EDX_ROOT}}/edx-platform:/edx/app/edxapp/edx-platform"
+   - /dev/log:/dev/log
+   - "{{DOCKER_DATA_ROOT}}/edxapp:/edx/var/edxapp"
+
+ cms:
+  image: opensaas/edxapp:trusty-v3
+  labels:
+    io.rancher.container.network: 'true'
+  links:
+   - db:db
+   - forums:forums
+   - xqueue:xqueue
+   - memcache:memcache
+   - mongo:mongo
+   - es:es
+   - rabbitmq:rabbitmq
+  command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
+  volumes:
+   - "{{DOCKER_EDX_ROOT}}/edx-platform:/edx/app/edxapp/edx-platform"
+   - /dev/log:/dev/log
+   - "{{DOCKER_DATA_ROOT}}/edxapp:/edx/var/edxapp"
+  # Add your containers here, specifying the base image you want to build from
+  # For example:
+  #
+  # web:
+  #   image: ubuntu:trusty
+  #   ports:
+  #     - "80:80"
+  #   command: ['/usr/bin/dumb-init', '/usr/sbin/apache2ctl', '-D', 'FOREGROUND']
+  #   dev_overrides:
+  #     environment:
+  #       - "DEBUG=1"
+  #
+ 
+ analytics:
+  image: edxops/trusty-common:v3
+  labels:
+    io.rancher.container.network: 'true'
+  links:
+   - db:db
+   - forums:forums
+   - xqueue:xqueue
+   - memcache:memcache
+   - mongo:mongo
+   - es:es
+   - rabbitmq:rabbitmq
+   - insights:insights
+  command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
+  volumes:
+   - "{{DOCKER_EDX_ROOT}}/analytics_api:/edx/app/analytics_api"
+   - /dev/log:/dev/log
+   
+ edxconfig:
+  image: edxops/trusty-common:v3
+  labels:
+    io.rancher.container.network: 'true'
+  links:
+   - db:db
+   - forums:forums
+   - xqueue:xqueue
+   - memcache:memcache
+   - mongo:mongo
+   - es:es
+  command: /bin/false
+  
+ insights:
+  image: opensaas/edx-insights
+  labels:
+    io.rancher.container.network: 'true'
+  links:
+   - db:db
+   - forums:forums
+   - xqueue:xqueue
+   - memcache:memcache
+   - mongo:mongo
+   - es:es
+   - rabbitmq:rabbitmq
+  command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
+  volumes:
+   - "{{DOCKER_EDX_ROOT}}/insights:/edx/app/insights"
+   - /dev/log:/dev/log
+   - "{{DOCKER_DATA_ROOT}}/insights:/edx/var/insights"
+   
+   
+registries: {}
+  # Add optional registries used for deployment. For example:
+  #  google:
+  #    url: https://gcr.io
+  #    namespace: my-cool-project-xxxxxx   

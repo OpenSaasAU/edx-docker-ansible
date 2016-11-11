@@ -1,0 +1,8 @@
+---
+dependencies:
+  - common
+  - edxapp_common
+  - role: jenkins_master
+    jenkins_plugins: "{{ jenkins_tools_plugins }}"
+    jenkins_version: "{{ jenkins_tools_version }}"
+    jenkins_deb_url: "http://pkg.jenkins-ci.org/debian-stable/binary/jenkins_{{ jenkins_version }}_all.deb"
