@@ -1,0 +1,3 @@
+ansible/roles/edx-docker-ansible-kubernetes/*
+
+ansible/shipit*
