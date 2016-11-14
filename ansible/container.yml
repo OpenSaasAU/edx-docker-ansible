@@ -9,10 +9,10 @@ services:
   volumes: 
    - "{{DOCKER_DATA_ROOT}}/mysql/data:/var/lib/mysql"
   environment:
-   MYSQL_ROOT_PASSWORD: password
-   MYSQL_DATABASE: edxapp
-   MYSQL_USER: edxapp001
-   MYSQL_PASSWORD: password
+   MYSQL_ROOT_PASSWORD: "{{ COMMON_MYSQL_MIGRATE_PASSWORD }}"
+   MYSQL_DATABASE: "{{ EDXAPP_MYSQL_DB_NAME }}"
+   MYSQL_USER: "{{ EDXAPP_MYSQL_USER }}"
+   MYSQL_PASSWORD: "{{ EDXAPP_MYSQL_PASSWORD }}"
   
  mongo:
   image: mongo:3.3
@@ -78,8 +78,8 @@ services:
   volumes:
    - "{{DOCKER_DATA_ROOT}}/rabbitmq/data:/var/lib/rabbitmq"
   environment:
-    RABBITMQ_DEFAULT_USER: celery
-    RABBITMQ_DEFAULT_PASS: celery
+    RABBITMQ_DEFAULT_USER: "{{ EDXAPP_CELERY_USER }}"
+    RABBITMQ_DEFAULT_PASS: "{{ EDXAPP_CELERY_PASSWORD }}"
 
  forums:
   image: ubuntu:xenial #opensaas/edx-forums
