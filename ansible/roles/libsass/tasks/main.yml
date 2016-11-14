@@ -39,6 +39,7 @@
   copy:
     src: '/usr/src/libsass/lib/{{ item }}'
     dest: '/usr/local/lib/{{ item }}'
+    remote_src: True
   with_items:
     - libsass.a
     - libsass.so
@@ -48,3 +49,4 @@
     src: '/usr/src/libsass/sassc/bin/sassc'
     dest: '/usr/local/bin/sassc'
     mode: 'u+rwx,go+rx,go-w'
+    remote_src: true

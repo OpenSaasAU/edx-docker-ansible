@@ -31,7 +31,7 @@
     force: yes
     owner: "{{ edxapp_user }}"
     mode: "0600"
-  when: EDXAPP_USE_GIT_IDENTITY
+  when: EDXAPP_USE_GIT_IDENTITY and skip_git is not defined
   tags:
     - install
     - install:base
@@ -39,6 +39,7 @@
 - name: set git fetch.prune to ignore deleted remote refs
   shell: git config --global fetch.prune true
   become_user: "{{ edxapp_user }}"
+  when: skip_git is not defined
   tags:
     - install
     - install:base
@@ -54,6 +55,7 @@
   environment:
     GIT_SSH: "{{ edxapp_git_ssh }}"
   register: edxapp_platform_checkout
+  when: skip_git is not defined
   tags:
     - install
     - install:code
@@ -61,6 +63,7 @@
 - name: git clean after checking out edx-platform
   shell: cd {{ edxapp_code_dir }} && git clean -xdf
   become_user: "{{ edxapp_user }}"
+  when: skip_git is not defined
   tags:
     - install
     - install:code
@@ -131,9 +134,25 @@
     - install
     - install:app-requirements
 
+- name: link nodejs to node
+  command: >
+    ln -s /usr/bin/nodejs /usr/bin/node
+    creates=/usr/bin/node
+  tags:
+    - install
+    - install:app-requirements
+    
 # Node play that need to be run after platform updates.
 - name: Install edx-platform npm dependencies
   shell: npm install chdir={{ edxapp_code_dir }}
+  become_user: "{{ edxapp_user }}"
+  environment: "{{ edxapp_environment }}"
+  tags:
+    - install
+    - install:app-requirements
+    
+- name: Install edx-ui-toolkit npm dependencies
+  shell: npm install chdir="{{ edxapp_code_dir }}/node_modules/edx-ui-toolkit"
   become_user: "{{ edxapp_user }}"
   environment: "{{ edxapp_environment }}"
   tags:

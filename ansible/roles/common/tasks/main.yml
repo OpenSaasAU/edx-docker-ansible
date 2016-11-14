@@ -26,6 +26,9 @@
   with_items:
     - "{{ common_web_user }}"
     - "{{ common_log_user }}"
+  tags:
+    - install
+    - install:base
 
 # Determine if machine is provisioned via vagrant
 # Some EC2-specific steps would need to be skipped
@@ -41,6 +44,9 @@
   apt_repository:
     repo: "{{ common_git_ppa }}"
   when: ansible_distribution in common_debian_variants
+  tags:
+    - install
+    - install:base
 
 
 # Ensure that we get the latest version of python 2.7
@@ -52,6 +58,9 @@
   when: >
     ansible_distribution in common_debian_variants and
     ansible_distribution_release in common_custom_ppa_releases
+  tags:
+    - install
+    - install:base
 
 - name: Add custom edX PPA
   apt_repository:
@@ -59,6 +68,9 @@
   when: >
     ansible_distribution in common_debian_variants and
     ansible_distribution_release in common_custom_ppa_releases
+  tags:
+    - install
+    - install:base
 
 
 - name: Install role-independent useful system packages
@@ -99,6 +111,9 @@
     group: "{{ item.group | default('root') }}" 
     mode: "0755"
   with_items: "{{ common_directories }}"
+  tags:
+    - install
+    - install:base
 
 - name: upload sudo config for key forwarding as root
   copy:

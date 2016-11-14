@@ -4,8 +4,8 @@ version: "1"
 services:
  db:
   image: mysql:5.7
-  labels:
-     io.rancher.container.network: 'true'
+#  labels:
+#     io.rancher.container.network: 'true'
   volumes: 
    - "{{DOCKER_DATA_ROOT}}/mysql/data:/var/lib/mysql"
   environment:
@@ -16,8 +16,8 @@ services:
   
  mongo:
   image: mongo:3.3
-  labels:
-    io.rancher.container.network: 'true'
+#  labels:
+#    io.rancher.container.network: 'true'
   command: /entrypoint.sh mongod --auth
   volumes:
    - "{{DOCKER_DATA_ROOT}}/mongo/data:/data/db"
@@ -30,25 +30,26 @@ services:
 
 # Need to build our own for ES 0.9
  es:
-  image: opensaas/edx-elasticsearch
-  labels:
-    io.rancher.container.network: 'true'
+  image: ubuntu:xenial # opensaas/edx-elasticsearch
+  command: ["/usr/share/elasticsearch/bin/elasticsearch","-f"]
+ # labels:
+#    io.rancher.container.network: 'true'
   volumes:
    - "{{DOCKER_DATA_ROOT}}/elasticsearch/data:/data"
 
 
  memcache:
   image: memcached:1.4.24
-  labels:
-    io.rancher.container.network: 'true'
+ # labels:
+#    io.rancher.container.network: 'true'
   volumes:
    - "{{DOCKER_DATA_ROOT}}/memcache/data:/data"
 
 
  nginx:
   image: nginx
-  labels:
-    io.rancher.container.network: 'true'
+ # labels:
+#    io.rancher.container.network: 'true'
   links:
    - lms:lms
    - cms:cms
@@ -72,8 +73,8 @@ services:
 
  rabbitmq:
   image: rabbitmq:3.5.3
-  labels:
-    io.rancher.container.network: 'true'
+ # labels:
+#    io.rancher.container.network: 'true'
   volumes:
    - "{{DOCKER_DATA_ROOT}}/rabbitmq/data:/var/lib/rabbitmq"
   environment:
@@ -81,9 +82,9 @@ services:
     RABBITMQ_DEFAULT_PASS: celery
 
  forums:
-  image: opensaas/edx-forums
-  labels:
-    io.rancher.container.network: 'true'
+  image: ubuntu:xenial #opensaas/edx-forums
+ # labels:
+#    io.rancher.container.network: 'true'
   links:
    - db:db
    - xqueue:xqueue
@@ -97,9 +98,9 @@ services:
 
    
  xqueue:
-  image: opensaas/edx-xqueue
-  labels:
-    io.rancher.container.network: 'true'
+  image: ubuntu:xenial #opensaas/edx-xqueue
+ # labels:
+#    io.rancher.container.network: 'true'
   links:
    - db:db
    - memcache:memcache
@@ -113,9 +114,9 @@ services:
 
 
  lms:
-  image: opensaas/edxapp:trusty-v3
-  labels:
-    io.rancher.container.network: 'true'
+  image: ubuntu:xenial #opensaas/edxapp:trusty-v3
+ # labels:
+#    io.rancher.container.network: 'true'
   links:
    - db:db
    - forums:forums
@@ -131,9 +132,9 @@ services:
    - "{{DOCKER_DATA_ROOT}}/edxapp:/edx/var/edxapp"
 
  cms:
-  image: opensaas/edxapp:trusty-v3
-  labels:
-    io.rancher.container.network: 'true'
+  image: ubuntu:xenial #opensaas/edxapp:trusty-v3
+ # labels:
+#    io.rancher.container.network: 'true'
   links:
    - db:db
    - forums:forums
@@ -148,10 +149,10 @@ services:
    - /dev/log:/dev/log
    - "{{DOCKER_DATA_ROOT}}/edxapp:/edx/var/edxapp"
 
-celeryworker:
-  image: opensaas/edxapp:trusty-v3
-  labels:
-    io.rancher.container.network: 'true'
+ edxworker:
+  image: ubuntu:xenial #opensaas/edxapp:trusty-v3
+ # labels:
+#    io.rancher.container.network: 'true'
   links:
    - db:db
    - forums:forums
@@ -163,13 +164,13 @@ celeryworker:
   command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
   volumes:
    - "{{DOCKER_EDX_ROOT}}/edx-platform:/edx/app/edxapp/edx-platform"
-   - /dev/log:/dev/log
+   - /dev/log:/dev/log            
    
    
  analytics:
-  image: edxops/trusty-common:v3
-  labels:
-    io.rancher.container.network: 'true'
+  image: ubuntu:xenial #edxops/trusty-common:v3
+ # labels:
+#    io.rancher.container.network: 'true'
   links:
    - db:db
    - forums:forums
@@ -185,9 +186,9 @@ celeryworker:
    - /dev/log:/dev/log
    
  edxconfig:
-  image: edxops/trusty-common:v3
-  labels:
-    io.rancher.container.network: 'true'
+  image: ubuntu:xenial #edxops/trusty-common:v3
+ # labels:
+#    io.rancher.container.network: 'true'
   links:
    - db:db
    - forums:forums
@@ -198,9 +199,9 @@ celeryworker:
   command: /bin/false
   
  insights:
-  image: opensaas/edx-insights
-  labels:
-    io.rancher.container.network: 'true'
+  image: ubuntu:xenial #opensaas/edx-insights
+ # labels:
+ #   io.rancher.container.network: 'true'
   links:
    - db:db
    - forums:forums

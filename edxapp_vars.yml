@@ -41,8 +41,6 @@ worker_core_mult:
   lms: 1
   cms: 1
 
-service_variants_enabled:
-  - "{{ inventory_hostname }}"
 
 edxapp_staticfile_dir: '/edx/var/edxapp/staticfiles'
 

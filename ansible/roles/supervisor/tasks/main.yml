@@ -151,9 +151,9 @@
     owner: root
     group: root
   when: not (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int < 16)
-  tags:
-    - install
-    - install:base
+ # tags:
+#    - install
+#    - install:base
 
 - name: Write the pre_suprevisor python script
   copy:
@@ -219,9 +219,9 @@
     name: "{{ supervisor_service }}.service"
     enabled: yes
   when: not (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int < 16)
-  tags:
-    - install
-    - install:base
+ # tags:
+#    - install
+#    - install:base
 
 - name: Start supervisor
   service:

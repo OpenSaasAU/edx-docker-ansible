@@ -82,9 +82,9 @@
 - name: add ppas for current versions of nodejs
   apt_repository:
     repo: "{{ edxapp_chrislea_ppa }}"
-  tags:
-    - install
-    - install:base
+  #tags:
+#    - install
+#    - install:base
 
 - name: install system packages on which LMS and CMS rely
   apt:
