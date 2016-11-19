@@ -37,9 +37,6 @@ XQUEUE_NGINX_PORT: 18040
 
 EDXAPP_COMMENTS_SERVICE_URL: 'http://forums:4567'
 
-worker_core_mult:
-  lms: 1
-  cms: 1
 
 
 edxapp_staticfile_dir: '/edx/var/edxapp/staticfiles'
