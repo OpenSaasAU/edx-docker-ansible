@@ -37,14 +37,13 @@ XQUEUE_NGINX_PORT: 18040
 
 EDXAPP_COMMENTS_SERVICE_URL: 'http://forums:4567'
 
-
-
 edxapp_staticfile_dir: '/edx/var/edxapp/staticfiles'
 
 
 EDXAPP_PLATFORM_NAME: 'Opensaas Learning Platform'
 EDXAPP_SITE_NAME: 'edx.opensaas.local'
 EDXAPP_CMS_SITE_NAME: 'studio.edx.opensaas.local'
+EDXAPP_ANALYTICS_DASHBOARD_URL: 'http://insights.{{ EDXAPP_SITE_NAME }}:{{ INSIGHTS_NGINX_PORT }}'
 
 migrate_db: 'yes'
 COMMON_MYSQL_MIGRATE_USER: 'root'
