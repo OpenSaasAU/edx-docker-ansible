@@ -4,8 +4,6 @@ version: "1"
 services:
  db:
   image: mysql:5.7
-#  labels:
-#     io.rancher.container.network: 'true'
   volumes: 
    - "{{DOCKER_DATA_ROOT}}/mysql/data:/var/lib/mysql"
   environment:
@@ -16,8 +14,6 @@ services:
   
  mongo:
   image: mongo:3.3
-#  labels:
-#    io.rancher.container.network: 'true'
   command: /entrypoint.sh mongod --auth
   volumes:
    - "{{DOCKER_DATA_ROOT}}/mongo/data:/data/db"
@@ -32,24 +28,18 @@ services:
  es:
   image: ubuntu:xenial # opensaas/edx-elasticsearch
   command: ["/usr/share/elasticsearch/bin/elasticsearch","-f"]
- # labels:
-#    io.rancher.container.network: 'true'
   volumes:
    - "{{DOCKER_DATA_ROOT}}/elasticsearch/data:/data"
 
 
  memcache:
   image: memcached:1.4.24
- # labels:
-#    io.rancher.container.network: 'true'
   volumes:
    - "{{DOCKER_DATA_ROOT}}/memcache/data:/data"
 
 
  nginx:
   image: nginx
- # labels:
-#    io.rancher.container.network: 'true'
   links:
    - lms:lms
    - cms:cms
@@ -73,8 +63,6 @@ services:
 
  rabbitmq:
   image: rabbitmq:3.5.3
- # labels:
-#    io.rancher.container.network: 'true'
   volumes:
    - "{{DOCKER_DATA_ROOT}}/rabbitmq/data:/var/lib/rabbitmq"
   environment:
@@ -83,8 +71,6 @@ services:
 
  forums:
   image: ubuntu:xenial #opensaas/edx-forums
- # labels:
-#    io.rancher.container.network: 'true'
   links:
    - db:db
    - xqueue:xqueue
@@ -99,8 +85,6 @@ services:
    
  xqueue:
   image: ubuntu:xenial #opensaas/edx-xqueue
- # labels:
-#    io.rancher.container.network: 'true'
   links:
    - db:db
    - memcache:memcache
@@ -115,8 +99,6 @@ services:
 
  lms:
   image: ubuntu:xenial #opensaas/edxapp:trusty-v3
- # labels:
-#    io.rancher.container.network: 'true'
   links:
    - db:db
    - forums:forums
@@ -133,8 +115,6 @@ services:
 
  cms:
   image: ubuntu:xenial #opensaas/edxapp:trusty-v3
- # labels:
-#    io.rancher.container.network: 'true'
   links:
    - db:db
    - forums:forums
@@ -151,8 +131,6 @@ services:
 
  edxworker:
   image: ubuntu:xenial #opensaas/edxapp:trusty-v3
- # labels:
-#    io.rancher.container.network: 'true'
   links:
    - db:db
    - forums:forums
@@ -169,8 +147,6 @@ services:
    
  analytics:
   image: ubuntu:xenial #edxops/trusty-common:v3
- # labels:
-#    io.rancher.container.network: 'true'
   links:
    - db:db
    - forums:forums
@@ -187,8 +163,6 @@ services:
    
  edxconfig:
   image: ubuntu:xenial #edxops/trusty-common:v3
- # labels:
-#    io.rancher.container.network: 'true'
   links:
    - db:db
    - forums:forums
@@ -200,8 +174,6 @@ services:
   
  insights:
   image: ubuntu:xenial #opensaas/edx-insights
- # labels:
- #   io.rancher.container.network: 'true'
   links:
    - db:db
    - forums:forums
