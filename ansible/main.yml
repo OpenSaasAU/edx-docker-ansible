@@ -30,6 +30,7 @@
   hosts: nginx
   roles:
     - common_vars
+    - {role: letsencrypt, when: NGINX_ENABLE_SSL is defined and NGINX_ENABLE_SSL and USE_LETSENCRYPT is defined and USE_LETSENCYRPT, tags: ['install:configuration']}
     - role: nginx
       nginx_sites:
       - cms
@@ -79,6 +80,7 @@
     - common_vars
     - docker
     - { role: 'edxapp', skip_static_remove: True, skip_git: true, service_variants_enabled: ['cms'], migrate_db: 'no' }
+    - {role: demo, when: edx_install_demo is defined and edx_install_demo, tags: ['install:configuration', 'migrate']}
     
 - hosts: edxworker
   gather_facts: True
