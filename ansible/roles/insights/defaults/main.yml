@@ -49,6 +49,7 @@ INSIGHTS_EMAIL_HOST_PASSWORD: "mail_password"
 INSIGHTS_EMAIL_HOST_USER: "mail_user"
 INSIGHTS_EMAIL_PORT: 587
 INSIGHTS_ENABLE_AUTO_AUTH: false
+INSIGHTS_EMAIL_USE_TLS: false
 INSIGHTS_SEGMENT_IGNORE_EMAIL_REGEX: !!null
 INSIGHTS_THEME_SCSS: 'sass/themes/open-edx.scss'
 INSIGHTS_RESEARCH_URL: 'https://www.edx.org/research-pedagogy'
@@ -112,6 +113,7 @@ INSIGHTS_CONFIG:
   EMAIL_HOST_PASSWORD: '{{ INSIGHTS_EMAIL_HOST_PASSWORD }}'
   EMAIL_HOST_USER: '{{ INSIGHTS_EMAIL_HOST_USER }}'
   EMAIL_PORT: '{{ INSIGHTS_EMAIL_PORT }}'
+  EMAIL_USE_TLS: "{{ INSIGHTS_EMAIL_USE_TLS }}"
   # static file config
   STATICFILES_DIRS: ["{{ insights_static_path }}"]
   STATIC_ROOT: "{{ COMMON_DATA_DIR }}/{{ insights_service_name }}/staticfiles"
