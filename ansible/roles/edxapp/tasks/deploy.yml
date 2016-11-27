@@ -135,9 +135,10 @@
     - install:app-requirements
 
 - name: link nodejs to node
-  command: >
-    ln -s /usr/bin/nodejs /usr/bin/node
-    creates=/usr/bin/node
+  file:
+    src: /usr/bin/nodejs
+    dest: /usr/bin/node
+    state: link
   tags:
     - install
     - install:app-requirements
