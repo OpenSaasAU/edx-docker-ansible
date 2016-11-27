@@ -8,7 +8,7 @@ EDXAPP_MYSQL_PASSWORD: 'password'
 
 
 #Mysql Root Password
-COMMON_MYSQL_MIGRATE_PASSWORD: 'password'
+COMMON_MYSQL_MIGRATE_PASS: 'password'
 
 EDXAPP_MYSQL_DB_NAME: 'edxapp'
 

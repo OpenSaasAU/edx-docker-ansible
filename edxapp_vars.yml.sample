@@ -47,6 +47,7 @@ EDXAPP_ANALYTICS_DASHBOARD_URL: 'http://insights.{{ EDXAPP_SITE_NAME }}:{{ INSIG
 
 migrate_db: 'yes'
 COMMON_MYSQL_MIGRATE_USER: 'root'
+COMMON_MYSQL_MIGRATE_PASS: 'password'
     
 XQUEUE_MYSQL_DB_NAME: 'xqueuedb'
 XQUEUE_MYSQL_USER: 'xqueue001'

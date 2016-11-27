@@ -7,7 +7,7 @@ services:
   volumes: 
    - "{{DOCKER_DATA_ROOT}}/mysql/data:/var/lib/mysql"
   environment:
-   MYSQL_ROOT_PASSWORD: "{{ COMMON_MYSQL_MIGRATE_PASSWORD }}"
+   MYSQL_ROOT_PASSWORD: "{{ COMMON_MYSQL_MIGRATE_PASS }}"
    MYSQL_DATABASE: "{{ EDXAPP_MYSQL_DB_NAME }}"
    MYSQL_USER: "{{ EDXAPP_MYSQL_USER }}"
    MYSQL_PASSWORD: "{{ EDXAPP_MYSQL_PASSWORD }}"
