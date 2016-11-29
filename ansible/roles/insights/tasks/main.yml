@@ -45,7 +45,7 @@
 - name: create nodeenv
   shell: >
     creates={{ insights_nodeenv_dir }}
-    {{ insights_venv_dir }}/bin/nodeenv {{ insights_nodeenv_dir }}  --prebuilt --node=6.9.1
+    {{ insights_venv_dir }}/bin/nodeenv {{ insights_nodeenv_dir }}  --prebuilt --node=6.7.0
   become_user: "{{ insights_user }}"
   tags:
     - install
