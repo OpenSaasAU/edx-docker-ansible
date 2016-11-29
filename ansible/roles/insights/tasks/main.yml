@@ -37,7 +37,7 @@
     virtualenv="{{ insights_venv_dir }}" 
     state=present extra_args="--exists-action w"
   become_user: "{{ insights_user }}"
-  with_items: insights_requirements
+  with_items: "{{ insights_requirements }}"
   tags:
     - install
     - install:app-requirements
