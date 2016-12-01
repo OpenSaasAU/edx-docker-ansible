@@ -4,7 +4,6 @@
 # Add any roles or other modules you'll need to this directory too.
 # For many examples of roles, check out Ansible Galaxy: https://galaxy.ansible.com/
 # 
-
     
 - hosts: es,edxconfig,lms,cms,edxworker,xqueue,analytics,forums,insights
   gather_facts: false
@@ -17,7 +16,6 @@
   tags:
     - install
     - install:app-requirements
-
     
 - hosts: mongo,nginx
   gather_facts: false
@@ -66,7 +64,7 @@
    - common_vars
    - docker
    - elasticsearch
-   - oraclejdk
+   - { role: oraclejdk, tags: ['install:app-requirements'] }
     
     
 - hosts: lms
