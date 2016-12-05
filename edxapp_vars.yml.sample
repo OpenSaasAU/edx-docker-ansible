@@ -104,7 +104,7 @@ INSIGHTS_CMS_BASE: "http://cms:8010"
 INSIGHTS_BASE_URL: "http://insights:8110"
 INSIGHTS_MEMCACHE:
   - "memcache:11211"
-ANALYTICS_API_ENDPOINT: "http://analtyics:8100/api/v0"
+ANALYTICS_API_ENDPOINT: "http://analytics:8100/api/v0"
 INSIGHTS_DATABASE_NAME: insightsdb
 INSIGHTS_DATABASES:
   # rw user
