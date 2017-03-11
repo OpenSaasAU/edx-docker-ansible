@@ -13,7 +13,7 @@
     - install
     - install:app-requirements
     
-- hosts: es,edxconfig,lms,cms,edxworker,xqueue,analytics,forums,insights
+- hosts: es,edxconfig,lms,cms,edxworker,analytics,forums,insights,analytics_pipeline
   gather_facts: false
   tasks:
     - raw: which python || apt-get update
@@ -99,12 +99,12 @@
     - docker
     - { role: 'edxapp', celery_worker: True, skip_git: true }    
 
-- hosts: xqueue
-  gather_facts: True
-  roles:
-    - common_vars
-    - docker
-    - xqueue
+#- hosts: xqueue
+#  gather_facts: True
+#  roles:
+#    - common_vars
+#    - docker
+#    - xqueue
 
 - hosts: analytics
   gather_facts: True
@@ -129,3 +129,13 @@
     - common_vars
     - docker
     - insights
+    
+    
+- name: Deploy Analytics Pipeline
+  hosts: analytics_pipeline
+  become: true
+  gather_facts: True
+  roles:
+    - common_vars
+    - docker
+    - analytics_pipeline

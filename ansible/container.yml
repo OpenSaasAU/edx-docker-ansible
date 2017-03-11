@@ -13,7 +13,7 @@ services:
    MYSQL_PASSWORD: "{{ EDXAPP_MYSQL_PASSWORD }}"
   
  mongo:
-  image: mongo:3.3
+  image: mongo:3.4
   command: /entrypoint.sh mongod --auth
   volumes:
    - "{{DOCKER_DATA_ROOT}}/mongo/data:/data/db"
@@ -83,18 +83,18 @@ services:
    - "{{DOCKER_EDX_ROOT}}/cs_comments_service:/edx/app/forum/cs_comments_service"
 
    
- xqueue:
-  image: ubuntu:xenial #opensaas/edx-xqueue
-  links:
-   - db:db
-   - memcache:memcache
-   - mongo:mongo
-   - es:es
-   - rabbitmq:rabbitmq
-  command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
-  volumes:
-   - "{{DOCKER_EDX_ROOT}}/xqueue:/edx/app/edxapp/xqueue"
-   - /dev/log:/dev/log
+# xqueue:
+#  image: ubuntu:xenial #opensaas/edx-xqueue
+#  links:
+#   - db:db
+#   - memcache:memcache
+#   - mongo:mongo
+#   - es:es
+#   - rabbitmq:rabbitmq
+#  command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
+#  volumes:
+#   - "{{DOCKER_EDX_ROOT}}/xqueue:/edx/app/edxapp/xqueue"
+#   - /dev/log:/dev/log
 
 
  lms:
