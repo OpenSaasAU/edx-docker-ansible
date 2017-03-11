@@ -43,7 +43,7 @@ services:
   links:
    - lms:lms
    - cms:cms
-   - xqueue:xqueue
+#   - xqueue:xqueue
    - insights:insights
    - analytics:analytics
   volumes:
@@ -73,7 +73,7 @@ services:
   image: ubuntu:xenial #opensaas/edx-forums
   links:
    - db:db
-   - xqueue:xqueue
+#   - xqueue:xqueue
    - memcache:memcache
    - mongo:mongo
    - es:es
@@ -102,7 +102,7 @@ services:
   links:
    - db:db
    - forums:forums
-   - xqueue:xqueue
+#   - xqueue:xqueue
    - memcache:memcache
    - mongo:mongo
    - es:es
@@ -118,7 +118,7 @@ services:
   links:
    - db:db
    - forums:forums
-   - xqueue:xqueue
+#   - xqueue:xqueue
    - memcache:memcache
    - mongo:mongo
    - es:es
@@ -134,7 +134,7 @@ services:
   links:
    - db:db
    - forums:forums
-   - xqueue:xqueue
+#   - xqueue:xqueue
    - memcache:memcache
    - mongo:mongo
    - es:es
@@ -150,7 +150,7 @@ services:
   links:
    - db:db
    - forums:forums
-   - xqueue:xqueue
+#   - xqueue:xqueue
    - memcache:memcache
    - mongo:mongo
    - es:es
@@ -166,7 +166,7 @@ services:
   links:
    - db:db
    - forums:forums
-   - xqueue:xqueue
+ #  - xqueue:xqueue
    - memcache:memcache
    - mongo:mongo
    - es:es
@@ -177,7 +177,7 @@ services:
   links:
    - db:db
    - forums:forums
-   - xqueue:xqueue
+#   - xqueue:xqueue
    - memcache:memcache
    - mongo:mongo
    - es:es
@@ -193,7 +193,7 @@ services:
   links:
    - db:db
    - forums:forums
-   - xqueue:xqueue
+#   - xqueue:xqueue
    - memcache:memcache
    - mongo:mongo
    - es:es
