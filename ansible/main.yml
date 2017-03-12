@@ -34,6 +34,17 @@
     - install
     - install:app-requirements
     
+- name: Deploy Analytics Pipeline
+  hosts: analytics_pipeline
+  become: true
+  gather_facts: True
+  roles:
+    - common_vars
+    - docker
+    - { role: 'hadoop_master', tags: ['install:app-requirements'] }
+    - { role: 'hive', tags: ['install:app-requirements'] }
+    - { role: 'sqoop', tags: ['install:app-requirements'] }
+    - analytics_pipeline    
   
 - name: Deploy Nginx
   hosts: nginx
@@ -130,15 +141,3 @@
     - docker
     - insights
     
-    
-- name: Deploy Analytics Pipeline
-  hosts: analytics_pipeline
-  become: true
-  gather_facts: True
-  roles:
-    - common_vars
-    - docker
-    - { role: 'hadoop_master', tags: ['install:app-requirements'] }
-    - { role: 'hive', tags: ['install:app-requirements'] }
-    - { role: 'sqoop', tags: ['install:app-requirements'] }
-    - analytics_pipeline

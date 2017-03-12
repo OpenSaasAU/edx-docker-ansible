@@ -1,4 +1,3 @@
-
 # Override these variables
 # to change the base directory
 # where edX is installed
@@ -10,6 +9,9 @@ COMMON_HTPASSWD_PASS: edx
 COMMON_BASIC_AUTH_EXCEPTIONS:
   - 192.168.0.0/16
   - 172.16.0.0/12
+
+# Settings to use for calls to edxapp manage.py
+COMMON_EDXAPP_SETTINGS: 'aws'
 
 # Turn on syncing logs on rotation for edx
 # application and tracking logs, must also
@@ -42,12 +44,12 @@ common_directories:
   - path: "/etc/logrotate.d/hourly"
   - path: "/etc/rsyslog.d/50-default.conf"
     state: absent
-    
+
 COMMON_ENVIRONMENT: 'default_env'
 COMMON_DEPLOYMENT: 'default_deployment'
 COMMON_PIP_VERBOSITY: ''
 COMMON_PYPI_MIRROR_URL: 'https://pypi.python.org/simple'
-COMMON_NPM_MIRROR_URL: 'http://registry.npmjs.org'
+COMMON_NPM_MIRROR_URL: 'https://registry.npmjs.org'
 COMMON_UBUNTU_APT_KEYSERVER: "http://keyserver.ubuntu.com/pks/lookup?op=get&fingerprint=on&search="
 
 COMMON_EDX_PPA: "deb http://ppa.edx.org {{ ansible_distribution_release }} main"
@@ -95,6 +97,7 @@ COMMON_ENABLE_NEWRELIC_APP: False
 COMMON_ENABLE_MINOS: False
 COMMON_TAG_EC2_INSTANCE: False
 common_boto_version: '2.34.0'
+common_node_version: '6.9.4'
 common_redhat_pkgs:
   - ntp
   - lynx
@@ -115,7 +118,7 @@ common_debian_pkgs:
   - python2.7-dev
 
 # Packages that should be installed from our custom PPA, i.e. COMMON_EDX_PPA
-common_custom_debian_pkgs:
+old_python_debian_pkgs:
   - "python2.7=2.7.10-0+{{ ansible_distribution_release }}1"
 
 common_pip_pkgs:
@@ -149,8 +152,8 @@ common_debian_variants:
   - Ubuntu
   - Debian
 
-# Only attempt to use our custom PPA for these releases
-common_custom_ppa_releases:
+# We only have to install old Python for these releases:
+old_python_ppa_releases:
   - precise
   - trusty
 
@@ -179,7 +182,6 @@ common_close_all_caches: |
             cache = get_cache(cache_name)
             if hasattr(cache, 'close'):
                 cache.close()
-
         # The 1.4 global default cache object needs to be closed also: 1.4
         # doesn't ensure you get the same object when requesting the same
         # cache. The global default is a separate Python object from the cache
@@ -188,6 +190,17 @@ common_close_all_caches: |
         cache = django_cache.cache
         if hasattr(cache, 'close'):
             cache.close()
-
 COMMON_TRACKING_LOG_ROTATION:
   - size 1M
+
+# If you include configuration from multiple sources and want to ensure that
+# all sources are included when running playbooks, this provides a way to check that.
+# As an example, if you have a secure configuration repo, you can do
+# COMMON_EXTRA_CONFIGURATION_SOURCES_CHECKING: true
+# COMMON_EXTRA_CONFIGURATION_SOURCES:
+#  - COMMON_USING_SECURE_REPO
+# The common role will then ensure that COMMON_USING_SECURE_REPO is defined and true.
+# This will ensure that you've included a file that sets
+# COMMON_USING_SECURE_REPO: true
+COMMON_EXTRA_CONFIGURATION_SOURCES_CHECKING: false
+COMMON_EXTRA_CONFIGURATION_SOURCES: []
