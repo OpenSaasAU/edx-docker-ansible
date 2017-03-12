@@ -55,7 +55,14 @@
   tags:
     - install
     - install:configuration
-    
+
+- name: install python mysqldb module
+  pip:
+    name: MySQL-python
+    state: present
+  tags:
+    - install
+    - install:app-requirements
     
 - name: install startup file
   template:
