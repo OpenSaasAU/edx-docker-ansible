@@ -200,7 +200,7 @@ services:
    - rabbitmq:rabbitmq
    - insights:insights
   command: |
-    /bin/bash -c "service yarn start && service hdfs start && tail -f {{DOCKER_EDX_ROOT}}/hadoop/hadoop/logs/hadoop.log"
+    /bin/bash -c "/edx/app/hadoop/hadoop/docker-startup.sh"
   volumes:
    - "{{DOCKER_EDX_ROOT}}/hadoop:/edx/app/hadoop"
    - "{{DOCKER_DATA_ROOT}}/analytics_pipline:/edx/etc/edx-analytics-pipeline"
