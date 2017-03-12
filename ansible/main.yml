@@ -138,7 +138,7 @@
   roles:
     - common_vars
     - docker
-    - { role: hadoop-master, tags: ['install:app-requirements'] }
-    - { role: hive, tags: ['install:app-requirements'] }
-    - { role: sqoop, tags: ['install:app-requirements'] }
+    - { role: 'hadoop_master', tags: ['install:app-requirements'] }
+    - { role: 'hive', tags: ['install:app-requirements'] }
+    - { role: 'sqoop', tags: ['install:app-requirements'] }
     - analytics_pipeline
