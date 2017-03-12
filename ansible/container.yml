@@ -204,7 +204,7 @@ services:
   volumes:
    - "{{DOCKER_EDX_ROOT}}/hadoop:/edx/app/hadoop"
    - "{{DOCKER_DATA_ROOT}}/analytics_pipline:/edx/etc/edx-analytics-pipeline"
-   - "{{DOCKER_DATA_ROOT}}/hadoop:/edx/app/hadoop"
+   - "{{DOCKER_DATA_ROOT}}/hadoop:/edx/var/hadoop"
    
    
 registries: {}

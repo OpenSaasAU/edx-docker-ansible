@@ -1,0 +1,14 @@
+[Unit]
+Description=Job that runs the yarn daemon
+Documentation=man:yarn(1)
+
+[Service]
+User={{ hadoop_common_user }}
+Type=forking
+Environment=statedir=/var/cache/foo
+ExecStartPre=/bin/sh -ec . {{ HADOOP_COMMON_CONF_DIR }}/hadoop-env.sh
+ExecStart=/bin/sh -ec start-yarn.sh
+ExecStop=/bin/sh -ec . {{ HADOOP_COMMON_CONF_DIR }}/hadoop-env.sh && stop-yarn.sh
+
+[Install]
+WantedBy=multi-user.target

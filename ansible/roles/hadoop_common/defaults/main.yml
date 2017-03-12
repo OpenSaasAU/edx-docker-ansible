@@ -49,7 +49,7 @@ hadoop_common_env: "{{ HADOOP_COMMON_HOME }}/hadoop_env"
 #
 
 hadoop_common_debian_pkgs:
-  - llvm-gcc
+  - llvm
   - build-essential
   - make
   - cmake
@@ -58,6 +58,7 @@ hadoop_common_debian_pkgs:
   - libtool
   - zlib1g-dev
   - maven
+  - openssh-server
 
 hadoop_common_redhat_pkgs: []
 

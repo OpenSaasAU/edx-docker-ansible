@@ -35,6 +35,9 @@
   with_items:
     - "{{ common_web_user }}"
     - "{{ common_log_user }}"
+  tags:
+    - "install"
+    - "install:base"
 
 # Determine if machine is provisioned via vagrant
 # Some EC2-specific steps would need to be skipped
@@ -50,6 +53,9 @@
   apt_repository:
     repo: "{{ common_git_ppa }}"
   when: ansible_distribution in common_debian_variants
+  tags:
+    - "install"
+    - "install:base"
 
 
 # Ensure that we can install old software if need be.
@@ -60,6 +66,9 @@
     state: "present"
   when: >
     ansible_distribution in common_debian_variants
+  tags:
+    - "install"
+    - "install:base"
 - name: Add custom edX PPA
   # Ensure that we get the latest version of python 2.7
   # MySQL 5.6 is from our own PPA: https://bugs.mysql.com/bug.php?id=84848
@@ -67,6 +76,9 @@
     repo: "{{ COMMON_EDX_PPA }}"
   when: >
     ansible_distribution in common_debian_variants
+  tags:
+    - "install"
+    - "install:base"
 - name: Install role-independent useful system packages
   # do this before log dir setup; rsyslog package guarantees syslog user present
   apt:
@@ -76,6 +88,9 @@
     update_cache: yes
   with_items: "{{ common_debian_pkgs }}"
   when: ansible_distribution in common_debian_variants
+  tags:
+    - "install"
+    - "install:base"
 
 - name: Install role-independent useful system packages from custom PPA
   apt:
@@ -87,6 +102,9 @@
   when: >
     ansible_distribution in common_debian_variants and
     ansible_distribution_release in old_python_ppa_releases
+  tags:
+    - "install"
+    - "install:base"
 - name: Install role-independent useful system packages
   yum:
     name: "{{ item }}"
@@ -94,6 +112,9 @@
     update_cache: yes
   with_items: "{{ common_redhat_pkgs }}"
   when: ansible_distribution in common_redhat_variants
+  tags:
+    - "install"
+    - "install:base"
 
 
 - name: Create common directories
@@ -104,6 +125,9 @@
     group: "{{ item.group | default('root') }}"
     mode: "0755"
   with_items: "{{ common_directories }}"
+  tags:
+    - "install"
+    - "install:base"
 
 - name: upload sudo config for key forwarding as root
   copy:
@@ -113,6 +137,9 @@
     owner: root
     group: root
     mode: "0440"
+  tags:
+    - "install"
+    - "install:base"
 
 - name: pip install virtualenv
   pip:
@@ -121,6 +148,9 @@
     extra_args: "-i {{ COMMON_PYPI_MIRROR_URL }}"
   with_items: "{{ common_pip_pkgs }}"
   when: ansible_distribution in common_debian_variants
+  tags:
+    - "install"
+    - "install:base"
 
 
 - name: update /etc/hosts
@@ -154,6 +184,9 @@
     - { src: 'etc/logrotate.d/hourly/edx_logrotate.j2', dest: '/etc/logrotate.d/hourly/edx-services' }
     - { src: 'etc/cron.hourly/logrotate.j2', dest: '/etc/cron.hourly/logrotate', mode: '0555' }
     - { src: 'etc/logrotate.d/hourly/edx_logrotate_tracking_log.j2', dest: '/etc/logrotate.d/hourly/tracking.log' }
+  tags:
+    - "install"
+    - "install:base"
 
   # TODO: restarts no matter which template has changed, need to examine
   # the results

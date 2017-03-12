@@ -1,0 +1,18 @@
+##/bin/bash
+
+. {{ HADOOP_COMMON_CONF_DIR }}/hadoop-env.sh
+
+rm /tmp/*.pid
+
+sudo /usr/sbin/sshd -D &
+
+start-dfs.sh
+start-yarn.sh
+
+if [[ $1 = "-d" || $2 = "-d" ]]; then
+  while true; do sleep 1000; done
+fi
+
+if [[ $1 = "-bash" || $2 = "-bash" ]]; then
+  /bin/bash
+fi

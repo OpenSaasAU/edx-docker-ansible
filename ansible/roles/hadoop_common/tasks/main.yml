@@ -119,9 +119,28 @@
     - hdfs.conf
     - yarn.conf
 
+- name: systemd scripts installed
+  template:
+    src: "{{ item }}.j2"
+    dest: "/lib/systemd/system/{{ item }}"
+    mode: 0640
+    owner: root
+    group: root
+  with_items:
+    - hdfs.service
+    - yarn.service
+    
+
 - name: hadoop env file exists
   file:
     path: "{{ hadoop_common_env }}"
+    state: touch
+    owner: "{{ hadoop_common_user }}"
+    group: "{{ hadoop_common_group }}"
+    
+- name: touch bashrc to ensure it exsists
+  file:
+    path: "{{ HADOOP_COMMON_USER_HOME }}/.bashrc"
     state: touch
     owner: "{{ hadoop_common_user }}"
     group: "{{ hadoop_common_group }}"

@@ -47,6 +47,26 @@
   tags:
     - install
     - install:configuration
+    
+- name: Create sshd run directory
+  file:
+    path: /var/run/sshd
+    state: directory
+  tags:
+    - install
+    - install:configuration
+    
+    
+- name: install startup file
+  template:
+    src: docker-startup.sh.j2
+    dest: "{{ HADOOP_COMMON_HOME }}/docker-startup.sh"
+    mode: 0740
+    owner: "{{ hadoop_common_user }}"
+    group: "{{ hadoop_common_group }}"
+  tags:
+    - install
+    - install:configuration
 
 - name: Store output database credentials for analytics pipeline
   copy:
@@ -127,6 +147,21 @@
     - install
     - install:app-requirements
 
+- name: remove and known_host keys
+  shell: >
+    ssh-keygen -f '/edx/app/hadoop/.ssh/known_hosts' -R localhost
+  become_user: "{{ hadoop_common_user }}"
+  tags:
+    - install
+    - install:app-requirements
+    
+- name: start services
+  shell: "{{ HADOOP_COMMON_HOME }}/docker-startup.sh"
+  become_user: "{{ hadoop_common_user }}"
+  tags:
+    - install
+    - install:app-requirements
+
 - name: Ensure hdfs services are started
   service:
     name: hdfs
@@ -135,6 +170,7 @@
     - manage
     - manage:start
 
+    
 - name: Ensure map reduce services are started
   service:
     name: yarn
@@ -142,6 +178,7 @@
   tags:
     - manage
     - manage:start
+
 
 - name: Ensure package dir exists in HDFS
   shell: ". {{ HADOOP_COMMON_CONF_DIR }}/hadoop-env.sh && hdfs dfs -mkdir -p /edx-analytics-pipeline/packages/"
