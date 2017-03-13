@@ -37,13 +37,16 @@
 # ansible-playbook -i 'localhost,' ./analytics_pipeline.yml  -e@/ansible/vars/deployment.yml -e@/ansible/vars/env-deployment.yml
 #
 
-- name: Create config directory
+- name: Create required directories
   file:
-    path: "{{ ANALYTICS_PIPELINE_CONFIG_DIR }}"
+    path: "{{ item }}"
     state: directory
     owner: "{{ hadoop_common_user }}"
     group: "{{ hadoop_common_group }}"
     mode: "0755"
+  with_items:
+    - "{{ ANALYTICS_PIPELINE_CONFIG_DIR }}"
+    - "{{ analytics_pipline_repo.path }}"
   tags:
     - install
     - install:configuration
@@ -55,11 +58,44 @@
   tags:
     - install
     - install:configuration
-
-- name: install python mysqldb module
+    
+- name: create pipeline venv and install ansible
   pip:
-    name: MySQL-python
+    name: ansible
     state: present
+    virtualenv: "{{ HADOOP_COMMON_USER_HOME }}/{{ analytics_pipeline_role_name }}"
+  become_user: "{{ hadoop_common_user }}"
+  tags:
+    - install
+    - install:app-requirements
+
+- name: checkout edx-analytics-pipeline
+  git:
+    dest: "{{ analytics_pipline_repo.path }}"
+    repo: "{{ analytics_pipline_repo.repo }}"
+    version: "{{ analytics_pipline_repo.version }}"
+    accept_hostkey: yes
+  become_user: "{{ hadoop_common_user }}"
+  tags:
+    - install
+    - install:app-requirements
+
+- name: make edx-analytics-pipeline
+  shell: ". {{ HADOOP_COMMON_USER_HOME }}/{{ analytics_pipeline_role_name }}/bin/activate && make bootstrap"
+  args:
+     chdir: "{{ analytics_pipline_repo.path }}"
+  become_user: "{{ hadoop_common_user }}"
+  tags:
+    - install
+    - install:app-requirements
+    
+- name: install required pip modules
+  pip:
+    name: "{{ item }}"
+    state: present
+  with_items:
+   - MySQL-python
+   - ansible
   tags:
     - install
     - install:app-requirements
@@ -116,7 +152,7 @@
     - install:configuration
 
 - name: Util library source checked out
-  git_2_0_1:
+  git:
     repo: "{{ analytics_pipeline_util_library.repo }}"
     dest: "{{ analytics_pipeline_util_library.path }}"
     version: "{{ analytics_pipeline_util_library.version }}"
@@ -235,6 +271,15 @@
   tags:
     - install
     - install:configuration
+    
+- name: setup remote-task
+  shell: ". {{ HADOOP_COMMON_USER_HOME }}/{{ analytics_pipeline_role_name }}/bin/activate && remote-task --host localhost --repo {{ analytics_pipline_repo.repo }} --user {{ hadoop_common_user }} --override-config {{ analytics_pipline_repo.path }}/config/devstack.cfg --remote-name analyticstack --wait TotalEventsDailyTask --interval 2015 --output-root hdfs://localhost:9000/output/ --local-scheduler"
+  args:
+     chdir: "{{ HADOOP_COMMON_USER_HOME }}"
+  become_user: "{{ hadoop_common_user }}"
+  tags:
+    - install
+    - install:app-requirements
 
 #- name: Grant access to table storing test data in output database
 #  mysql_user:

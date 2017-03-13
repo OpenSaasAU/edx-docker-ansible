@@ -59,6 +59,8 @@ hadoop_common_debian_pkgs:
   - zlib1g-dev
   - maven
   - openssh-server
+  - libssl-dev
+  - libmysqlclient-dev
 
 hadoop_common_redhat_pkgs: []
 

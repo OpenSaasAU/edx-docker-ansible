@@ -6,6 +6,8 @@ rm /tmp/*.pid
 
 sudo /usr/sbin/sshd -D &
 
+ssh-keygen -f "/edx/app/hadoop/.ssh/known_hosts" -R 0.0.0.0
+
 start-dfs.sh
 start-yarn.sh
 

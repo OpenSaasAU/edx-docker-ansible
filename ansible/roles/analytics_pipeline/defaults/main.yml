@@ -11,6 +11,8 @@
 # Defaults for role analytics_pipeline
 #
 
+ANALYTICS_PIPELINE_VERSION: master
+
 ANALYTICS_PIPELINE_OUTPUT_DATABASE_NAME: "{{ ANALYTICS_API_REPORTS_DB_NAME }}"
 ANALYTICS_PIPELINE_OUTPUT_DATABASE:
   username: pipeline001
@@ -40,6 +42,13 @@ analytics_pipeline_util_library:
   path: /var/tmp/edx-analytics-hadoop-util
   repo: https://github.com/edx/edx-analytics-hadoop-util
   version: master
+  
+analytics_pipline_repo: 
+   repo: https://github.com/edx/edx-analytics-pipeline
+   version: "{{ ANALYTICS_PIPELINE_VERSION }}"
+   path: "{{ HADOOP_COMMON_USER_HOME }}/{{ analytics_pipeline_role_name }}/edx-analytics-pipeline"
+
+
 
 #
 # OS packages

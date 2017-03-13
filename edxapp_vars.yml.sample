@@ -1,3 +1,12 @@
+edx_platform_version: 'open-release/ficus.master'
+certs_version: 'open-release/ficus.master'
+forum_version: 'open-release/ficus.master'
+INSIGHTS_VERSION: 'open-release/ficus.master'
+ANALYTICS_API_VERSION: 'open-release/ficus.master'
+ANALYTICS_PIPELINE_VERSION: 'open-release/ficus.master'
+
+analytics_pipline_repo.repo: https://github.com/OpenSaasAU/edx-analytics-pipeline
+
 EDXAPP_MYSQL_HOST: "db"
 EDXAPP_MONGO_HOSTS:
   - "mongo"

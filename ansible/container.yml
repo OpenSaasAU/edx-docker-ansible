@@ -200,10 +200,11 @@ services:
    - rabbitmq:rabbitmq
    - insights:insights
   command: |
-    /bin/bash -c "/edx/app/hadoop/hadoop/docker-startup.sh"
+    /bin/bash su -m hadoop -c /edx/app/hadoop/hadoop/docker-startup.sh
   volumes:
    - "{{DOCKER_EDX_ROOT}}/hadoop:/edx/app/hadoop"
    - "{{DOCKER_DATA_ROOT}}/analytics_pipline:/edx/etc/edx-analytics-pipeline"
+   - "{{DOCKER_EDX_ROOT}}/analytics_pipline:/edx/app/edx-analytics-pipeline"
    - "{{DOCKER_DATA_ROOT}}/hadoop:/edx/var/hadoop"
    
    
