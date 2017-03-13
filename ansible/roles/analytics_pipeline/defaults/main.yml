@@ -43,7 +43,7 @@ analytics_pipeline_util_library:
   repo: https://github.com/edx/edx-analytics-hadoop-util
   version: master
   
-analytics_pipline_repo: 
+analytics_pipeline_repo: 
    repo: https://github.com/edx/edx-analytics-pipeline
    version: "{{ ANALYTICS_PIPELINE_VERSION }}"
    path: "{{ HADOOP_COMMON_USER_HOME }}/{{ analytics_pipeline_role_name }}/edx-analytics-pipeline"

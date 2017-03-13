@@ -46,7 +46,7 @@
     mode: "0755"
   with_items:
     - "{{ ANALYTICS_PIPELINE_CONFIG_DIR }}"
-    - "{{ analytics_pipline_repo.path }}"
+    - "{{ analytics_pipeline_repo.path }}"
   tags:
     - install
     - install:configuration
@@ -71,9 +71,9 @@
 
 - name: checkout edx-analytics-pipeline
   git:
-    dest: "{{ analytics_pipline_repo.path }}"
-    repo: "{{ analytics_pipline_repo.repo }}"
-    version: "{{ analytics_pipline_repo.version }}"
+    dest: "{{ analytics_pipeline_repo.path }}"
+    repo: "{{ analytics_pipeline_repo.repo }}"
+    version: "{{ analytics_pipeline_repo.version }}"
     accept_hostkey: yes
   become_user: "{{ hadoop_common_user }}"
   tags:
@@ -83,7 +83,7 @@
 - name: make edx-analytics-pipeline
   shell: ". {{ HADOOP_COMMON_USER_HOME }}/{{ analytics_pipeline_role_name }}/bin/activate && make bootstrap"
   args:
-     chdir: "{{ analytics_pipline_repo.path }}"
+     chdir: "{{ analytics_pipeline_repo.path }}"
   become_user: "{{ hadoop_common_user }}"
   tags:
     - install
@@ -273,7 +273,7 @@
     - install:configuration
     
 - name: setup remote-task
-  shell: ". {{ HADOOP_COMMON_USER_HOME }}/{{ analytics_pipeline_role_name }}/bin/activate && remote-task --host localhost --repo {{ analytics_pipline_repo.repo }} --user {{ hadoop_common_user }} --override-config {{ analytics_pipline_repo.path }}/config/devstack.cfg --remote-name analyticstack --wait TotalEventsDailyTask --interval 2015 --output-root hdfs://localhost:9000/output/ --local-scheduler"
+  shell: ". {{ HADOOP_COMMON_USER_HOME }}/{{ analytics_pipeline_role_name }}/bin/activate && remote-task --host localhost --repo {{ analytics_pipeline_repo.repo }} --user {{ hadoop_common_user }} --override-config {{ analytics_pipeline_repo.path }}/config/devstack.cfg --remote-name analyticstack --wait TotalEventsDailyTask --interval 2015 --output-root hdfs://localhost:9000/output/ --local-scheduler"
   args:
      chdir: "{{ HADOOP_COMMON_USER_HOME }}"
   become_user: "{{ hadoop_common_user }}"
