@@ -206,6 +206,13 @@
     - install
     - install:app-requirements
 
+- name: wait for services to start
+  pause:
+    minutes: 2
+  tags:
+    - install
+    - install:app-requirements
+
 - name: Ensure hdfs services are started
   service:
     name: hdfs
