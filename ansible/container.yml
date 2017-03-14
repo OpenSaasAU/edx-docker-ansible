@@ -159,6 +159,7 @@ services:
   command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
   volumes:
    - "{{DOCKER_EDX_ROOT}}/analytics_api:/edx/app/analytics_api"
+   - "{{DOCKER_DATA_ROOT}}/analytics_api:/edx/var/analytics_api"
    - /dev/log:/dev/log
    
  edxconfig:

@@ -11,10 +11,4 @@ ssh-keygen -f "/edx/app/hadoop/.ssh/known_hosts" -R 0.0.0.0
 start-dfs.sh
 start-yarn.sh
 
-if [[ $1 = "-d" || $2 = "-d" ]]; then
-  while true; do sleep 1000; done
-fi
-
-if [[ $1 = "-bash" || $2 = "-bash" ]]; then
-  /bin/bash
-fi
+while true; do sleep 1000; done
