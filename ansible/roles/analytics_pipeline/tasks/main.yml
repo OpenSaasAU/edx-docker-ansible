@@ -200,7 +200,7 @@
     - install:app-requirements
     
 - name: start services
-  shell: "{{ HADOOP_COMMON_HOME }}/docker-startup.sh"
+  shell: "{{ HADOOP_COMMON_HOME }}/docker-startup.sh &"
   become_user: "{{ hadoop_common_user }}"
   tags:
     - install
