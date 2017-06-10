@@ -1,0 +1,74 @@
+---
+#
+# edX Configuration
+#
+# github:     https://github.com/edx/configuration
+# wiki:       https://openedx.atlassian.net/wiki/display/OpenOPS
+# code style: https://openedx.atlassian.net/wiki/display/OpenOPS/Ansible+Code+Conventions
+# license:    https://github.com/edx/configuration/blob/master/LICENSE.TXT
+#
+#
+#
+# Tasks for role docker
+# 
+# Overview:
+#
+# This is a special role for providing common, docker specific tasks.
+#
+# Dependencies:
+#
+# Inherits from the container role via meta/main.yml
+ 
+
+- name: apt-get update
+  raw: which python || apt-get update
+  tags:
+    - install
+    - install:app-requirements
+    
+- name: Install Python
+  raw: which python || apt-get install -y python
+  tags:
+    - install
+    - install:app-requirements
+  when: nginx_install is defined  
+
+- name: Install DB dependancies
+  raw: which python || apt-get install -y python2.7 python-pip python-dev libmysqlclient-dev
+  tags:
+    - install
+    - install:app-requirements
+  when: db_install is defined  
+  
+    
+- name: install dependancies
+  raw: (which python && which aptitude) || apt-get install -y python2.7 python-pip python-apt python-yaml python-jinja2 libmysqlclient-dev git-core build-essential sudo
+  tags:
+   - install
+   - install:app-requirements
+  when: db_install is not defined and nginx_install is not defined
+
+    
+- name: upgrade pip
+  raw: pip install --upgrade pip                         
+  tags:
+   - install
+   - install:app-requirements
+  when: nginx_install is not defined
+
+    
+- name: install setuptools
+  raw: pip install setuptools=="24.0.3"                            
+  tags:
+   - install
+   - install:app-requirements
+  when: db_install is not defined and nginx_install is not defined
+
+    
+- name: install virtualenv
+  raw: pip install virtualenv=="15.0.2"                            
+  tags:
+   - install
+   - install:app-requirements
+  when: db_install is not defined and nginx_install is not defined
+

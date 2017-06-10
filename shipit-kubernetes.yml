@@ -1,0 +1,8 @@
+- name: Deploy edx-docker-ansible to  kubernetes
+  hosts: localhost
+  gather_facts: false
+  connection: local
+  vars:
+    playbook_debug: false
+  roles:
+  - role: edx-docker-ansible-kubernetes

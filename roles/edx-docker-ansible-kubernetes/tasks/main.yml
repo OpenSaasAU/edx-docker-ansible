@@ -1,0 +1,424 @@
+
+- kube_deployment:
+    labels:
+      app: edx-docker-ansible
+      service: mongo
+    deployment_name: mongo
+    containers:
+    - securityContext: {}
+      name: mongo
+      image: borisno2/edx-docker-ansible-mongo:20161114070745
+      args:
+      - /entrypoint.sh
+      - mongod
+      - --auth
+      volumeMounts:
+      - mountPath: /data/db
+        name: data-db
+        readOnly: false
+    replace: true
+    volumes:
+    - hostPath:
+        path: /mongo/data
+      name: data-db
+  register: output
+
+- debug: var=output
+  when: playbook_debug
+
+- kube_deployment:
+    labels:
+      app: edx-docker-ansible
+      service: nginx
+    deployment_name: nginx
+    containers:
+    - securityContext: {}
+      name: nginx
+      image: borisno2/edx-docker-ansible-nginx:20161114070745
+      args:
+      - /bin/bash
+      - -c
+      - nginx -g 'daemon off;'
+      volumeMounts:
+      - mountPath: /edx/var
+        name: edx-var
+        readOnly: false
+    replace: true
+    volumes:
+    - emptyDir:
+        medium: ''
+      name: edx-var
+  register: output
+
+- debug: var=output
+  when: playbook_debug
+
+- kube_deployment:
+    labels:
+      app: edx-docker-ansible
+      service: forums
+    deployment_name: forums
+    containers:
+    - securityContext: {}
+      name: forums
+      image: borisno2/edx-docker-ansible-forums:20161114070745
+      args:
+      - /edx/app/supervisor/venvs/supervisor/bin/supervisord
+      - -n
+      - --configuration
+      - /edx/app/supervisor/supervisord.conf
+      volumeMounts:
+      - mountPath: /edx/app/forum/cs_comments_service
+        name: edx-app-forum-cs_comments_service
+        readOnly: false
+    replace: true
+    volumes:
+    - hostPath:
+        path: /cs_comments_service
+      name: edx-app-forum-cs_comments_service
+  register: output
+
+- debug: var=output
+  when: playbook_debug
+
+- kube_deployment:
+    labels:
+      app: edx-docker-ansible
+      service: lms
+    deployment_name: lms
+    containers:
+    - securityContext: {}
+      name: lms
+      image: borisno2/edx-docker-ansible-lms:20161114070745
+      args:
+      - /edx/app/supervisor/venvs/supervisor/bin/supervisord
+      - -n
+      - --configuration
+      - /edx/app/supervisor/supervisord.conf
+      volumeMounts:
+      - mountPath: /edx/app/edxapp/edx-platform
+        name: edx-app-edxapp-edx-platform
+        readOnly: false
+      - mountPath: /dev/log
+        name: dev-log
+        readOnly: false
+      - mountPath: /edx/var/edxapp
+        name: edx-var-edxapp
+        readOnly: false
+    replace: true
+    volumes:
+    - hostPath:
+        path: /edx-platform
+      name: edx-app-edxapp-edx-platform
+    - hostPath:
+        path: /dev/log
+      name: dev-log
+    - hostPath:
+        path: /edxapp
+      name: edx-var-edxapp
+  register: output
+
+- debug: var=output
+  when: playbook_debug
+
+- kube_deployment:
+    labels:
+      app: edx-docker-ansible
+      service: db
+    deployment_name: db
+    containers:
+    - securityContext: {}
+      name: db
+      env:
+        MYSQL_DATABASE: edxapp
+        MYSQL_PASSWORD: password
+        MYSQL_ROOT_PASSWORD: password
+        MYSQL_USER: edxapp001
+      image: mysql:5.7
+      volumeMounts:
+      - mountPath: /var/lib/mysql
+        name: var-lib-mysql
+        readOnly: false
+    replace: true
+    volumes:
+    - hostPath:
+        path: /mysql/data
+      name: var-lib-mysql
+  register: output
+
+- debug: var=output
+  when: playbook_debug
+
+- kube_deployment:
+    labels:
+      app: edx-docker-ansible
+      service: rabbitmq
+    deployment_name: rabbitmq
+    containers:
+    - securityContext: {}
+      name: rabbitmq
+      env:
+        RABBITMQ_DEFAULT_PASS: celery
+        RABBITMQ_DEFAULT_USER: celery
+      image: rabbitmq:3.5.3
+      volumeMounts:
+      - mountPath: /var/lib/rabbitmq
+        name: var-lib-rabbitmq
+        readOnly: false
+    replace: true
+    volumes:
+    - hostPath:
+        path: /rabbitmq/data
+      name: var-lib-rabbitmq
+  register: output
+
+- debug: var=output
+  when: playbook_debug
+
+- kube_deployment:
+    labels:
+      app: edx-docker-ansible
+      service: analytics
+    deployment_name: analytics
+    containers:
+    - securityContext: {}
+      name: analytics
+      image: borisno2/edx-docker-ansible-analytics:20161114070745
+      args:
+      - /edx/app/supervisor/venvs/supervisor/bin/supervisord
+      - -n
+      - --configuration
+      - /edx/app/supervisor/supervisord.conf
+      volumeMounts:
+      - mountPath: /edx/app/analytics_api
+        name: edx-app-analytics_api
+        readOnly: false
+      - mountPath: /dev/log
+        name: dev-log
+        readOnly: false
+    replace: true
+    volumes:
+    - hostPath:
+        path: /analytics_api
+      name: edx-app-analytics_api
+    - hostPath:
+        path: /dev/log
+      name: dev-log
+  register: output
+
+- debug: var=output
+  when: playbook_debug
+
+- kube_deployment:
+    labels:
+      app: edx-docker-ansible
+      service: edxworker
+    deployment_name: edxworker
+    containers:
+    - securityContext: {}
+      name: edxworker
+      image: borisno2/edx-docker-ansible-edxworker:20161114070745
+      args:
+      - /edx/app/supervisor/venvs/supervisor/bin/supervisord
+      - -n
+      - --configuration
+      - /edx/app/supervisor/supervisord.conf
+      volumeMounts:
+      - mountPath: /edx/app/edxapp/edx-platform
+        name: edx-app-edxapp-edx-platform
+        readOnly: false
+      - mountPath: /dev/log
+        name: dev-log
+        readOnly: false
+    replace: true
+    volumes:
+    - hostPath:
+        path: /edx-platform
+      name: edx-app-edxapp-edx-platform
+    - hostPath:
+        path: /dev/log
+      name: dev-log
+  register: output
+
+- debug: var=output
+  when: playbook_debug
+
+- kube_deployment:
+    labels:
+      app: edx-docker-ansible
+      service: memcache
+    deployment_name: memcache
+    containers:
+    - securityContext: {}
+      name: memcache
+      image: memcached:1.4.24
+      volumeMounts:
+      - mountPath: /data
+        name: data
+        readOnly: false
+    replace: true
+    volumes:
+    - hostPath:
+        path: /memcache/data
+      name: data
+  register: output
+
+- debug: var=output
+  when: playbook_debug
+
+- kube_deployment:
+    labels:
+      app: edx-docker-ansible
+      service: edxconfig
+    deployment_name: edxconfig
+    containers:
+    - securityContext: {}
+      name: edxconfig
+      image: borisno2/edx-docker-ansible-edxconfig:20161114070745
+      args:
+      - /bin/false
+    replace: true
+  register: output
+
+- debug: var=output
+  when: playbook_debug
+
+- kube_deployment:
+    labels:
+      app: edx-docker-ansible
+      service: xqueue
+    deployment_name: xqueue
+    containers:
+    - securityContext: {}
+      name: xqueue
+      image: borisno2/edx-docker-ansible-xqueue:20161114070745
+      args:
+      - /edx/app/supervisor/venvs/supervisor/bin/supervisord
+      - -n
+      - --configuration
+      - /edx/app/supervisor/supervisord.conf
+      volumeMounts:
+      - mountPath: /edx/app/edxapp/xqueue
+        name: edx-app-edxapp-xqueue
+        readOnly: false
+      - mountPath: /dev/log
+        name: dev-log
+        readOnly: false
+    replace: true
+    volumes:
+    - hostPath:
+        path: /xqueue
+      name: edx-app-edxapp-xqueue
+    - hostPath:
+        path: /dev/log
+      name: dev-log
+  register: output
+
+- debug: var=output
+  when: playbook_debug
+
+- kube_deployment:
+    labels:
+      app: edx-docker-ansible
+      service: cms
+    deployment_name: cms
+    containers:
+    - securityContext: {}
+      name: cms
+      image: borisno2/edx-docker-ansible-cms:20161114070745
+      args:
+      - /edx/app/supervisor/venvs/supervisor/bin/supervisord
+      - -n
+      - --configuration
+      - /edx/app/supervisor/supervisord.conf
+      volumeMounts:
+      - mountPath: /edx/app/edxapp/edx-platform
+        name: edx-app-edxapp-edx-platform
+        readOnly: false
+      - mountPath: /dev/log
+        name: dev-log
+        readOnly: false
+      - mountPath: /edx/var/edxapp
+        name: edx-var-edxapp
+        readOnly: false
+    replace: true
+    volumes:
+    - hostPath:
+        path: /edx-platform
+      name: edx-app-edxapp-edx-platform
+    - hostPath:
+        path: /dev/log
+      name: dev-log
+    - hostPath:
+        path: /edxapp
+      name: edx-var-edxapp
+  register: output
+
+- debug: var=output
+  when: playbook_debug
+
+- kube_deployment:
+    labels:
+      app: edx-docker-ansible
+      service: es
+    deployment_name: es
+    containers:
+    - securityContext: {}
+      name: es
+      image: borisno2/edx-docker-ansible-es:20161114070745
+      args:
+      - /usr/share/elasticsearch/bin/elasticsearch
+      - -f
+      volumeMounts:
+      - mountPath: /data
+        name: data
+        readOnly: false
+    replace: true
+    volumes:
+    - hostPath:
+        path: /elasticsearch/data
+      name: data
+  register: output
+
+- debug: var=output
+  when: playbook_debug
+
+- kube_deployment:
+    labels:
+      app: edx-docker-ansible
+      service: insights
+    deployment_name: insights
+    containers:
+    - securityContext: {}
+      name: insights
+      image: borisno2/edx-docker-ansible-insights:20161114070745
+      args:
+      - /edx/app/supervisor/venvs/supervisor/bin/supervisord
+      - -n
+      - --configuration
+      - /edx/app/supervisor/supervisord.conf
+      volumeMounts:
+      - mountPath: /edx/app/insights
+        name: edx-app-insights
+        readOnly: false
+      - mountPath: /dev/log
+        name: dev-log
+        readOnly: false
+      - mountPath: /edx/var/insights
+        name: edx-var-insights
+        readOnly: false
+    replace: true
+    volumes:
+    - hostPath:
+        path: /insights
+      name: edx-app-insights
+    - hostPath:
+        path: /dev/log
+      name: dev-log
+    - hostPath:
+        path: /insights
+      name: edx-var-insights
+  register: output
+
+- debug: var=output
+  when: playbook_debug

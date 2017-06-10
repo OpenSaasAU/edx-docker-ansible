@@ -1,0 +1,4 @@
+---
+# defaults for edx-docker-ansible-kubernetes
+
+playbook_debug: no
