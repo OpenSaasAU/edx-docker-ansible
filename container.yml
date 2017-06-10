@@ -1,0 +1,299 @@
+version: "2"
+#defaults:
+settings:
+  conductor_base: ubuntu:xenial
+
+services:
+ db:
+  from: mysql:5.7
+  volumes: 
+   - "{{ DOCKER_DATA_ROOT }}/mysql/data:/var/lib/mysql"
+  environment:
+   MYSQL_ROOT_PASSWORD: "{{ COMMON_MYSQL_MIGRATE_PASS }}"
+   MYSQL_DATABASE: "{{ EDXAPP_MYSQL_DB_NAME }}"
+   MYSQL_USER: "{{ EDXAPP_MYSQL_USER }}"
+   MYSQL_PASSWORD: "{{ EDXAPP_MYSQL_PASSWORD }}"
+  roles:
+   - { role: docker-setup, gather_facts: no, db_install: true }
+   - common_vars
+   - { role: docker_db_setup, DB_MYSQL_HOST: 'localhost' } 
+  
+ mongo:
+  from: mongo:3.4
+  command: /entrypoint.sh mongod --auth
+  volumes:
+   - "{{ DOCKER_DATA_ROOT }}/mongo/data:/data/db"
+  roles:
+   - { role: docker-setup, gather_facts: no, db_install: true }
+   - common_vars
+   - mongo_docker
+
+# Need to build our own for ES 0.9
+ es:
+  from: ubuntu:xenial # opensaas/edx-elasticsearch
+  command: ["/usr/share/elasticsearch/bin/elasticsearch","-f"]
+  volumes:
+   - "{{ DOCKER_DATA_ROOT }}/elasticsearch/data:/data"
+  roles:
+   - { role: docker-setup, gather_facts: no }
+   - common_vars
+   - elasticsearch
+   - { role: oraclejdk, tags: ['install:app-requirements'] }
+
+
+ memcache:
+  from: memcached:1.4.24
+  volumes:
+   - "{{ DOCKER_DATA_ROOT }}/memcache/data:/data"
+
+
+ nginx:
+  from: nginx
+  links:
+   - lms:lms
+   - cms:cms
+#   - xqueue:xqueue
+   - insights:insights
+   - analytics:analytics
+  volumes:
+   - "{{ DOCKER_DATA_ROOT }}:/edx/var"
+  command: |
+    /bin/bash -c "nginx -g 'daemon off;'"
+  ports:
+   - 6080:80
+   - 6443:443
+   - 18000:18000
+   - 18010:18010
+   - 18020:18020
+   - 18040:18040
+   - 18100:18100
+   - 18110:18110
+  roles:
+   - { role: docker-setup, gather_facts: no, nginx_install: true }
+   - common_vars
+   - role: nginx
+     nginx_sites:
+      - cms
+      - lms
+      - analytics_api
+      - insights
+      - lms-preview
+      - xqueue
+     nginx_default_sites:
+      - lms
+      - cms
+
+
+ rabbitmq:
+  from: rabbitmq:3.5.3
+  volumes:
+   - "{{ DOCKER_DATA_ROOT }}/rabbitmq/data:/var/lib/rabbitmq"
+  environment:
+    RABBITMQ_DEFAULT_USER: "{{ EDXAPP_CELERY_USER }}"
+    RABBITMQ_DEFAULT_PASS: "{{ EDXAPP_CELERY_PASSWORD }}"
+
+ forums:
+  from: ubuntu:xenial #opensaas/edx-forums
+  links:
+   - db:db
+#   - xqueue:xqueue
+   - memcache:memcache
+   - mongo:mongo
+   - es:es
+   - rabbitmq:rabbitmq
+  command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
+  depends_on:
+    - db
+    - memcache
+    - mongo
+    - es
+    - rabbitmq
+  volumes:
+   - "{{ DOCKER_EDX_ROOT }}/cs_comments_service:/edx/app/forum/cs_comments_service"
+  roles:
+   - { role: docker-setup, gather_facts: no }
+   - common_vars
+   - forum
+
+   
+# xqueue:
+#  from: ubuntu:xenial #opensaas/edx-xqueue
+#  links:
+#   - db:db
+#   - memcache:memcache
+#   - mongo:mongo
+#   - es:es
+#   - rabbitmq:rabbitmq
+#  command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
+#  volumes:
+#   - "{{DOCKER_EDX_ROOT}}/xqueue:/edx/app/edxapp/xqueue"
+#   - /dev/log:/dev/log
+
+
+ lms:
+  from: ubuntu:xenial #opensaas/edxapp:trusty-v3
+  links:
+   - db:db
+   - forums:forums
+#   - xqueue:xqueue
+   - memcache:memcache
+   - mongo:mongo
+   - es:es
+   - rabbitmq:rabbitmq
+  command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
+  depends_on:
+    - db
+    - memcache
+    - mongo
+    - es
+    - rabbitmq
+  volumes:
+   - "{{ DOCKER_EDX_ROOT }}/edx-platform:/edx/app/edxapp/edx-platform"
+   - /dev/log:/dev/log
+   - "{{ DOCKER_DATA_ROOT }}/edxapp:/edx/var/edxapp"
+  roles:
+   - { role: docker-setup, gather_facts: no }
+   - common_vars
+   - {role: edxapp, service_variants_enabled: ['lms'], migrate_db: 'no'}
+
+ cms:
+  from: ubuntu:xenial #opensaas/edxapp:trusty-v3
+  links:
+   - db:db
+   - forums:forums
+#   - xqueue:xqueue
+   - memcache:memcache
+   - mongo:mongo
+   - es:es
+   - rabbitmq:rabbitmq
+  command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
+  depends_on:
+    - db
+    - memcache
+    - mongo
+    - es
+    - rabbitmq
+  volumes:
+   - "{{DOCKER_EDX_ROOT}}/edx-platform:/edx/app/edxapp/edx-platform"
+   - /dev/log:/dev/log
+   - "{{ DOCKER_DATA_ROOT }}/edxapp:/edx/var/edxapp"
+  roles:
+   - { role: docker-setup, gather_facts: no }
+   - common_vars
+   - { role: 'edxapp', skip_static_remove: True, skip_git: true, service_variants_enabled: ['cms'], migrate_db: 'no' }
+   - {role: demo, when: edx_install_demo is defined and edx_install_demo, tags: ['install:configuration', 'migrate']}
+
+ edxworker:
+  from: ubuntu:xenial #opensaas/edxapp:trusty-v3
+  links:
+   - db:db
+   - forums:forums
+#   - xqueue:xqueue
+   - memcache:memcache
+   - mongo:mongo
+   - es:es
+   - rabbitmq:rabbitmq
+  command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
+  depends_on:
+    - db
+    - memcache
+    - mongo
+    - es
+    - rabbitmq
+  volumes:
+   - "{{DOCKER_EDX_ROOT}}/edx-platform:/edx/app/edxapp/edx-platform"
+   - /dev/log:/dev/log 
+  roles:
+   - { role: docker-setup, gather_facts: no }
+   - common_vars
+   - { role: 'edxapp', celery_worker: True, skip_git: true }           
+   
+   
+ analytics:
+  from: ubuntu:xenial #edxops/trusty-common:v3
+  links:
+   - db:db
+   - forums:forums
+#   - xqueue:xqueue
+   - memcache:memcache
+   - mongo:mongo
+   - es:es
+   - rabbitmq:rabbitmq
+   - insights:insights
+  command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
+  depends_on:
+    - db
+    - memcache
+    - mongo
+    - es
+    - rabbitmq
+  volumes:
+   - "{{ DOCKER_EDX_ROOT }}/analytics_api:/edx/app/analytics_api"
+   - "{{ DOCKER_DATA_ROOT }}/analytics_api:/edx/var/analytics_api"
+   - /dev/log:/dev/log
+  roles:
+   - { role: docker-setup, gather_facts: no }
+   - common_vars
+   - analytics_api
+   
+  
+ insights:
+  from: ubuntu:xenial #opensaas/edx-insights
+  links:
+   - db:db
+   - forums:forums
+#   - xqueue:xqueue
+   - memcache:memcache
+   - mongo:mongo
+   - es:es
+   - rabbitmq:rabbitmq
+  command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
+  depends_on:
+    - db
+    - memcache
+    - mongo
+    - es
+    - rabbitmq
+  volumes:
+   - "{{DOCKER_EDX_ROOT}}/insights:/edx/app/insights"
+   - /dev/log:/dev/log
+   - "{{ DOCKER_DATA_ROOT }}/insights:/edx/var/insights"
+  roles:
+   - { role: docker-setup, gather_facts: no }
+   - common_vars
+   - insights
+   
+ analytics_pipeline:
+  from: ubuntu:xenial #edxops/trusty-common:v3
+  links:
+   - db:db
+   - forums:forums
+#   - xqueue:xqueue
+   - memcache:memcache
+   - mongo:mongo
+   - es:es
+   - rabbitmq:rabbitmq
+   - insights:insights
+  command: |
+    /bin/bash su -m hadoop -c /edx/app/hadoop/hadoop/docker-startup.sh
+  depends_on:
+    - db
+    - memcache
+    - mongo
+    - es
+    - rabbitmq
+  volumes:
+   - "{{ DOCKER_EDX_ROOT }}/hadoop:/edx/app/hadoop"
+   - "{{ DOCKER_DATA_ROOT }}/analytics_pipline:/edx/etc/edx-analytics-pipeline"
+   - "{{ DOCKER_EDX_ROOT }}/analytics_pipline:/edx/app/edx-analytics-pipeline"
+   - "{{ DOCKER_DATA_ROOT }}/hadoop:/edx/var/hadoop"
+  roles:
+   - { role: docker-setup, gather_facts: no }
+   - common_vars
+   - { role: 'hadoop_master', tags: ['install:app-requirements'] }
+   - { role: 'hive', tags: ['install:app-requirements'] }
+   - { role: 'sqoop', tags: ['install:app-requirements'] }
+   - analytics_pipeline 
+   
+   
+registries: {}

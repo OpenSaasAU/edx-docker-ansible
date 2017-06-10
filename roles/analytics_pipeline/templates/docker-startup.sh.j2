@@ -1,0 +1,14 @@
+##/bin/bash
+
+. {{ HADOOP_COMMON_CONF_DIR }}/hadoop-env.sh
+
+rm /tmp/*.pid
+
+sudo /usr/sbin/sshd -D &
+
+ssh-keygen -f "/edx/app/hadoop/.ssh/known_hosts" -R 0.0.0.0
+
+start-dfs.sh
+start-yarn.sh
+
+while true; do sleep 1000; done

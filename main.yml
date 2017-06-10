@@ -1,0 +1,143 @@
+# This should be your Ansible playbooks to provision your containers.
+# An inventory will be automatically created using the names of the services
+# from your container.yml file.
+# Add any roles or other modules you'll need to this directory too.
+# For many examples of roles, check out Ansible Galaxy: https://galaxy.ansible.com/
+# 
+- hosts: mongo
+  gather_facts: false
+  tasks:
+    - raw: which python || apt-get update
+    - raw: which python || apt-get install -y python
+  tags:
+    - install
+    - install:app-requirements
+    
+- hosts: es,edxconfig,lms,cms,edxworker,analytics,forums,insights,analytics_pipeline
+  gather_facts: false
+  tasks:
+    - raw: which python || apt-get update
+    - raw: (which python && which aptitude) || apt-get install -y python2.7 python-pip python-apt python-yaml python-jinja2 libmysqlclient-dev git-core build-essential sudo
+    - raw: pip install --upgrade pip
+    - raw: pip install setuptools=="24.0.3"
+    - raw: pip install virtualenv=="15.0.2"                            
+  tags:
+    - install
+    - install:app-requirements
+    
+- hosts: nginx
+  gather_facts: false
+  tasks:
+    - raw: which python || apt-get update
+    - raw: which python || apt-get install -y python
+  tags:
+    - install
+    - install:app-requirements
+    
+- name: Deploy Nginx
+  hosts: nginx
+  roles:
+    - common_vars
+    - {role: letsencrypt, when: NGINX_ENABLE_SSL is defined and NGINX_ENABLE_SSL and USE_LETSENCRYPT is defined and USE_LETSENCYRPT, tags: ['install:configuration']}
+    - role: nginx
+      nginx_sites:
+      - cms
+      - lms
+      - analytics_api
+      - insights
+      - lms-preview
+      - xqueue
+      nginx_default_sites:
+      - lms
+      - cms
+    
+- hosts: mongo
+  gather_facts: True
+  roles:
+    - common_vars
+    - mongo_docker
+    
+- hosts: edxconfig
+  gather_facts: True
+  roles:
+    - common_vars
+    - docker_db_setup
+
+- name: Deploy Analytics Pipeline
+  hosts: analytics_pipeline
+  become: true
+  gather_facts: True
+  roles:
+    - common_vars
+    - docker
+    - { role: 'hadoop_master', tags: ['install:app-requirements'] }
+    - { role: 'hive', tags: ['install:app-requirements'] }
+    - { role: 'sqoop', tags: ['install:app-requirements'] }
+    - analytics_pipeline    
+  
+- name: Deploy elasticsearch
+  hosts: es
+  sudo: True
+  gather_facts: True
+  roles:
+   - common_vars
+   - docker
+   - elasticsearch
+   - { role: oraclejdk, tags: ['install:app-requirements'] }
+    
+    
+- hosts: lms
+  gather_facts: True
+  become: true 
+  roles:
+    - common_vars
+    - docker
+    - {role: edxapp, service_variants_enabled: ['lms'], migrate_db: 'no'}
+    
+- hosts: cms
+  gather_facts: True
+  roles:
+    - common_vars
+    - docker
+    - { role: 'edxapp', skip_static_remove: True, skip_git: true, service_variants_enabled: ['cms'], migrate_db: 'no' }
+    - {role: demo, when: edx_install_demo is defined and edx_install_demo, tags: ['install:configuration', 'migrate']}
+    
+- hosts: edxworker
+  gather_facts: True
+  become: true 
+  roles:
+    - common_vars
+    - docker
+    - { role: 'edxapp', celery_worker: True, skip_git: true }    
+
+#- hosts: xqueue
+#  gather_facts: True
+#  roles:
+#    - common_vars
+#    - docker
+#    - xqueue
+
+- hosts: analytics
+  gather_facts: True
+  roles:
+    - common_vars
+    - docker
+    - analytics_api
+    
+    
+- name: Deploy forum
+  hosts: forums
+  roles:
+    - common_vars
+    - docker
+    - forum
+
+- name: Deploy Insights
+  hosts: insights
+  become: true
+  gather_facts: True
+  roles:
+    - common_vars
+    - docker
+    - insights
+    
