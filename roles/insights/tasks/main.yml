@@ -63,7 +63,7 @@
   shell: >
     chdir={{ insights_code_dir }}
     . {{ insights_venv_dir }}/bin/activate &&
-    . {{ insights_nodeenv_bin }}/activate && {{ insights_node_bin }}/bower install --production --config.interactive=false
+    . {{ insights_nodeenv_bin }}/activate && {{ insights_node_bin }}/bower install --production --config.interactive=false --allow-root
   become_user: "{{ insights_user }}"
   tags:
     - install
