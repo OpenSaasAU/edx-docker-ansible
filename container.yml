@@ -263,37 +263,37 @@ services:
    - common_vars
    - insights
    
- analytics_pipeline:
-  from: ubuntu:xenial #edxops/trusty-common:v3
-  links:
-   - db:db
-   - forums:forums
+# analytics_pipeline:
+#  from: ubuntu:xenial #edxops/trusty-common:v3
+#  links:
+#   - db:db
+#   - forums:forums
 #   - xqueue:xqueue
-   - memcache:memcache
-   - mongo:mongo
-   - es:es
-   - rabbitmq:rabbitmq
-   - insights:insights
-  command: |
-    /bin/bash su -m hadoop -c /edx/app/hadoop/hadoop/docker-startup.sh
-  depends_on:
-    - db
-    - memcache
-    - mongo
-    - es
-    - rabbitmq
-  volumes:
-   - "{{ DOCKER_EDX_ROOT }}/hadoop:/edx/app/hadoop"
-   - "{{ DOCKER_DATA_ROOT }}/analytics_pipline:/edx/etc/edx-analytics-pipeline"
-   - "{{ DOCKER_EDX_ROOT }}/analytics_pipline:/edx/app/edx-analytics-pipeline"
-   - "{{ DOCKER_DATA_ROOT }}/hadoop:/edx/var/hadoop"
-  roles:
-   - { role: docker-setup, gather_facts: no }
-   - common_vars
-   - { role: 'hadoop_master', tags: ['install:app-requirements'] }
-   - { role: 'hive', tags: ['install:app-requirements'] }
-   - { role: 'sqoop', tags: ['install:app-requirements'] }
-   - analytics_pipeline 
+#   - memcache:memcache
+#   - mongo:mongo
+#   - es:es
+#   - rabbitmq:rabbitmq
+#   - insights:insights
+#  command: |
+#    /bin/bash su -m hadoop -c /edx/app/hadoop/hadoop/docker-startup.sh
+#  depends_on:
+#    - db
+#    - memcache
+#    - mongo
+#    - es
+#    - rabbitmq
+#  volumes:
+#   - "{{ DOCKER_EDX_ROOT }}/hadoop:/edx/app/hadoop"
+#   - "{{ DOCKER_DATA_ROOT }}/analytics_pipline:/edx/etc/edx-analytics-pipeline"
+#   - "{{ DOCKER_EDX_ROOT }}/analytics_pipline:/edx/app/edx-analytics-pipeline"
+#   - "{{ DOCKER_DATA_ROOT }}/hadoop:/edx/var/hadoop"
+#  roles:
+#   - { role: docker-setup, gather_facts: no }
+#   - common_vars
+#   - { role: 'hadoop_master', tags: ['install:app-requirements'] }
+#   - { role: 'hive', tags: ['install:app-requirements'] }
+#   - { role: 'sqoop', tags: ['install:app-requirements'] }
+#   - analytics_pipeline 
    
    
 registries: {}
