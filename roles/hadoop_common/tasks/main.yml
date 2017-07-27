@@ -21,7 +21,10 @@
 #
 # oraclejdk: Not strictly required, but we tend to trust it more than openjdk.
 #
-
+- name: update apt cache
+  apt:
+    update_cache: yes
+    
 - name: install system packages
   apt:
     pkg: "{{ item }}"

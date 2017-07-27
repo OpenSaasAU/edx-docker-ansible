@@ -10,6 +10,7 @@ analytics_pipeline_repo:
    version: "{{ ANALYTICS_PIPELINE_VERSION }}"
    path: "{{ HADOOP_COMMON_USER_HOME }}/{{ analytics_pipeline_role_name }}/edx-analytics-pipeline"
 
+
 EDXAPP_MYSQL_HOST: "db"
 EDXAPP_MONGO_HOSTS:
   - "mongo"
@@ -21,7 +22,7 @@ EDXAPP_ELASTIC_SEARCH_CONFIG:
    port: 9200
 
 EDXAPP_CELERY_USER: 'celery'
-EDXAPP_CELERY_PASSWORD: 'celery'
+EDXAPP_CELERY_PASSWORD: 'password'
    
 EDXAPP_MEMCACHE: [ 'memcache:11211' ]
 MONGO_CLUSTERED: false
@@ -248,12 +249,13 @@ FORUM_SINATRA_ENV: "staging"
 ANALYTICS_PIPELINE_OUTPUT_DATABASE_NAME: "{{ ANALYTICS_API_REPORTS_DB_NAME }}"
 ANALYTICS_PIPELINE_OUTPUT_DATABASE:
   username: pipeline001
-  password: password
-  host: localhost
+  password: 'password'
+  host: db
   port: 3306
 
 ANALYTICS_PIPELINE_INPUT_DATABASE:
   username: "{{ COMMON_MYSQL_READ_ONLY_USER }}"
   password: "{{ COMMON_MYSQL_READ_ONLY_PASS }}"
-  host: localhost
+  host: db
   port: 3306
+
