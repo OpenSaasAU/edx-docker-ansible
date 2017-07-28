@@ -131,9 +131,9 @@ INSIGHTS_CONFIG:
   MODULE_PREVIEW_URL: "{{ INSIGHTS_MODULE_PREVIEW_URL }}"
   # When insights is co-located with other django services, we need to ensure they don't all
   # use the same cookie names.
-  SESSION_COOKIE_NAME:  "{{ INSIGHTS_SESSION_COOKIE_NAME | default('insights_sessionid') }}"
-  CSRF_COOKIE_NAME: "{{ INSIGHTS_CSRF_COOKIE_NAME | default('insights_csrftoken') }}"
-  LANGUAGE_COOKIE_NAME: "{{ INSIGHTS_LANGUAGE_COOKIE_NAME | default('insights_language') }}"
+  SESSION_COOKIE_NAME:  '{{ INSIGHTS_SESSION_COOKIE_NAME | default("insights_sessionid") }}'
+  CSRF_COOKIE_NAME: '{{ INSIGHTS_CSRF_COOKIE_NAME | default("insights_csrftoken") }}'
+  LANGUAGE_COOKIE_NAME: '{{ INSIGHTS_LANGUAGE_COOKIE_NAME | default("insights_language") }}'
   CMS_COURSE_SHORTCUT_BASE_URL: "{{ INSIGHTS_CMS_COURSE_SHORTCUT_BASE_URL }}"
   LEARNER_API_LIST_DOWNLOAD_FIELDS: "{{ INSIGHTS_LEARNER_API_LIST_DOWNLOAD_FIELDS }}"
 
