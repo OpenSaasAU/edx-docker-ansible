@@ -5,3 +5,5 @@ ansible/shipit*
 edxapp_vars.yml
 
 container_vars.yml
+
+ansible-deployment/
