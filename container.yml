@@ -20,7 +20,7 @@ services:
   
  mongo:
   from: mongo:3.4
-  command: /entrypoint.sh mongod --auth
+  command: ["/entrypoint.sh", "mongod", "--auth"]
   volumes:
    - "{{ DOCKER_DATA_ROOT }}/mongo/data:/data/db"
   roles:
@@ -101,12 +101,12 @@ services:
    - es:es
    - rabbitmq:rabbitmq
   command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
-  depends_on:
-    - db
-    - memcache
-    - mongo
-    - es
-    - rabbitmq
+  #depends_on:
+#    - db
+#    - memcache
+#    - mongo
+#    - es
+#    - rabbitmq
   volumes:
    - "{{ DOCKER_EDX_ROOT }}/cs_comments_service:/edx/app/forum/cs_comments_service"
   roles:
@@ -140,12 +140,12 @@ services:
    - es:es
    - rabbitmq:rabbitmq
   command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
-  depends_on:
-    - db
-    - memcache
-    - mongo
-    - es
-    - rabbitmq
+ # depends_on:
+#    - db
+#    - memcache
+ #   - mongo
+#    - es
+#    - rabbitmq
   volumes:
    - "{{ DOCKER_EDX_ROOT }}/edx-platform:/edx/app/edxapp/edx-platform"
    - /dev/log:/dev/log
@@ -166,12 +166,12 @@ services:
    - es:es
    - rabbitmq:rabbitmq
   command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
-  depends_on:
-    - db
-    - memcache
-    - mongo
-    - es
-    - rabbitmq
+#  depends_on:
+#    - db
+#    - memcache
+#    - mongo
+#    - es
+#    - rabbitmq
   volumes:
    - "{{DOCKER_EDX_ROOT}}/edx-platform:/edx/app/edxapp/edx-platform"
    - /dev/log:/dev/log
@@ -193,12 +193,12 @@ services:
    - es:es
    - rabbitmq:rabbitmq
   command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
-  depends_on:
-    - db
-    - memcache
-    - mongo
-    - es
-    - rabbitmq
+#  depends_on:
+#    - db
+#    - memcache
+#    - mongo
+#    - es
+#    - rabbitmq
   volumes:
    - "{{DOCKER_EDX_ROOT}}/edx-platform:/edx/app/edxapp/edx-platform"
    - /dev/log:/dev/log 
@@ -220,12 +220,12 @@ services:
    - rabbitmq:rabbitmq
    - insights:insights
   command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
-  depends_on:
-    - db
-    - memcache
-    - mongo
-    - es
-    - rabbitmq
+ # depends_on:
+#    - db
+#    - memcache
+#    - mongo
+#    - es
+#    - rabbitmq
   volumes:
    - "{{ DOCKER_EDX_ROOT }}/analytics_api:/edx/app/analytics_api"
    - "{{ DOCKER_DATA_ROOT }}/analytics_api:/edx/var/analytics_api"
@@ -247,12 +247,12 @@ services:
    - es:es
    - rabbitmq:rabbitmq
   command: ["/edx/app/supervisor/venvs/supervisor/bin/supervisord", "-n", "--configuration", "/edx/app/supervisor/supervisord.conf"]
-  depends_on:
-    - db
-    - memcache
-    - mongo
-    - es
-    - rabbitmq
+ # depends_on:
+#    - db
+#    - memcache
+#    - mongo
+#    - es
+#    - rabbitmq
   volumes:
    - "{{DOCKER_EDX_ROOT}}/insights:/edx/app/insights"
    - /dev/log:/dev/log
