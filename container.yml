@@ -6,6 +6,7 @@ settings:
 services:
  db:
   from: mysql:5.7
+  command: ["mysqld"]
   volumes: 
    - "{{ DOCKER_DATA_ROOT }}/mysql/data:/var/lib/mysql"
   environment:
@@ -43,6 +44,7 @@ services:
 
  memcache:
   from: memcached:1.4.24
+  command: ["memcached"]
   volumes:
    - "{{ DOCKER_DATA_ROOT }}/memcache/data:/data"
 
@@ -85,6 +87,7 @@ services:
 
  rabbitmq:
   from: rabbitmq:3.5.3
+  command: ["rabbitmq-server"]
   volumes:
    - "{{ DOCKER_DATA_ROOT }}/rabbitmq/data:/var/lib/rabbitmq"
   environment:
