@@ -26,8 +26,8 @@ EDXAPP_CELERY_PASSWORD: 'password'
    
 EDXAPP_MEMCACHE: [ 'memcache:11211' ]
 MONGO_CLUSTERED: false
-#EDXAPP_LMS_SITE_NAME: 'lms'
-#EDXAPP_CMS_SITE_NAME: 'cms'
+EDXAPP_LMS_SITE_NAME: 'lms'
+EDXAPP_CMS_SITE_NAME: 'cms'
 EDXAPP_RABBIT_HOSTNAME: 'rabbitmq'
 EDXAPP_PYTHON_SANDBOX: false
 edxapp_cms_gunicorn_host: 0.0.0.0

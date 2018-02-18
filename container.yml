@@ -81,7 +81,7 @@ services:
       - analytics_api
       - insights
       - lms-preview
-      - xqueue
+      #- xqueue
      nginx_default_sites:
       - lms
       - cms
